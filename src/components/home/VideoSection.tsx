@@ -1,0 +1,59 @@
+export default function VideoSection() {
+    return (
+        <section className="w-full bg-[#1a1a1a] flex justify-center overflow-hidden">
+            <div className="w-full max-w-[1440px] h-[783px] relative">
+                {/* 12-column Grid Container with specific margin and gutter */}
+                <div
+                    className="grid grid-cols-12 h-full w-full"
+                    style={{
+                        paddingLeft: '50px',
+                        paddingRight: '50px',
+                        columnGap: '20px'
+                    }}
+                >
+                    {/* Left Content Area (6 columns) */}
+                    <div className="col-span-12 lg:col-span-5 flex flex-col items-start" style={{ marginTop: '160px' }}>
+                        <span className="font-serif text-[20px] font-normal text-white">
+                            Dec 19, 2025 · Seoul
+                        </span>
+
+                        <h2 className="font-serif text-[54px] font-normal text-white leading-tight" style={{ marginTop: '23px' }}>
+                            Get the insights
+                        </h2>
+
+                        <p
+                            className="font-sans text-[18px] font-medium text-[#989898]"
+                            style={{
+                                marginTop: '23px',
+                                lineHeight: '20px'
+                            }}
+                        >
+                            Hold investment-grade gold with the speed of <br />
+                            crypto - without leaving the metal behind.
+                        </p>
+                    </div>
+
+                    {/* Right Video Area (7 columns) */}
+                    <div
+                        className="col-span-12 lg:col-span-7 flex justify-end"
+                        style={{ marginTop: '160px' }}
+                    >
+                        <div
+                            className="bg-black/40 relative overflow-hidden"
+                            style={{
+                                width: '823px',
+                                height: '463px',
+                                borderRadius: '30px'
+                            }}
+                        >
+                            {/* Video item/placeholder would go here */}
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <span className="text-[#444] font-sans">Video Placeholder (823 x 463)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+}
