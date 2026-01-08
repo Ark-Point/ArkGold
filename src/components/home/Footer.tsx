@@ -3,14 +3,24 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export default function Footer() {
+interface FooterProps {
+    isSubmitting?: boolean;
+    progress?: number;
+}
+
+export default function Footer({ isSubmitting, progress = 0 }: FooterProps) {
     return (
         <footer className="w-full bg-black flex justify-center overflow-hidden">
             <div className="w-full max-w-[1440px] h-[244px] relative bg-black flex flex-col items-center">
 
-                {/* Top White Line - 1240*2 */}
+                {/* Top Line - 1240*2 (Progress Bar baseline) */}
                 <div
-                    className="w-[1240px] h-[2px] bg-white"
+                    className="w-[1240px] h-[2px] transition-all duration-100 ease-linear"
+                    style={{
+                        background: isSubmitting
+                            ? `linear-gradient(to right, #F0B118 ${progress}%, white ${progress}%)`
+                            : 'white'
+                    }}
                 />
 
                 {/* Main Content Container - 56px gap from top line, 1240*123 */}
