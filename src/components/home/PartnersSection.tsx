@@ -1,252 +1,180 @@
 "use client";
 
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
+import Image from "next/image";
+
+const PARTNERS = [
+    { name: 'Aave', logo: '/images/section3-icon1.svg', description: 'Aave is a decentralized non-custodial liquidity protocol where users can participate as depositors or borrowers. depositors provide liquidity to the market to earn a passive income.' },
+    { name: 'AGORA', logo: '/images/section3-icon2.svg', description: 'Agora is an institutional-grade stablecoin issuance platform. It provides the necessary infrastructure for reliable, fiat-backed digital dollars that power global commerce and decentralized finance.' },
+    { name: 'Hex Trust', logo: '/images/section3-icon3.svg', description: 'Hex Trust is the leading institutional-grade digital asset custodian. Fully licensed and regulated, it provides bank-level security for digital assets across the globe.' },
+    { name: 'ITCEN GLOBAL', logo: '/images/section3-icon4.svg', description: 'ITCENGLOBAL is a strategic partner in digital commodity trading, bridging the gap between traditional resources and blockchain-based settlement solutions.' },
+    { name: 'MONAD', logo: '/images/section3-icon1.svg', description: 'Monad is a high-performance Ethereum-compatible L1 blockchain, optimized for ultra-high throughput and parallel execution, enabling a new generation of decentralized applications.' },
+    { name: 'Solana', logo: '/images/section3-icon2.svg', description: 'Solana is a decentralized blockchain built to enable scalable, user-friendly apps for the world. With high throughput and ultra-low fees, it provides the ideal foundation for institutional-grade digital assets.' },
+];
 
 export default function PartnersSection() {
     const [selectedIdx, setSelectedIdx] = useState(0);
-    const [isMobile, setIsMobile] = useState(false);
-    const scrollContainerRef = useRef<HTMLDivElement>(null);
-    const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
-
-    // Internal state refs to avoid closure staleness and re-render triggers
-    const targetScrollRef = useRef(0);
-    const currentScrollRef = useRef(0);
-    const selectedIdxRef = useRef(0);
-    const isAnimatingRef = useRef(false);
-    const isClickScrollingRef = useRef(false); // New lock for click-scroll
-    const wheelTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-    useEffect(() => {
-        setIsMobile(window.innerWidth < 1024);
-        const handleResize = () => setIsMobile(window.innerWidth < 1024);
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-
-    const PARTNERS = useMemo(() => [
-        { name: 'Aave', description: 'Aave is a decentralized non-custodial liquidity protocol where users can participate as depositors or borrowers. depositors provide liquidity to the market to earn a passive income.' },
-        { name: 'AGORA', description: 'Agora is an institutional-grade stablecoin issuance platform. It provides the necessary infrastructure for reliable, fiat-backed digital dollars that power global commerce and decentralized finance.' },
-        { name: 'Hex Trust', description: 'Hex Trust is the leading institutional-grade digital asset custodian. Fully licensed and regulated, it provides bank-level security for digital assets across the globe.' },
-        { name: 'ITCENGLOBAL', description: 'ITCENGLOBAL is a strategic partner in digital commodity trading, bridging the gap between traditional resources and blockchain-based settlement solutions.' },
-        { name: 'MONAD', description: 'Monad is a high-performance Ethereum-compatible L1 blockchain, optimized for ultra-high throughput and parallel execution, enabling a new generation of decentralized applications.' },
-        { name: 'SOLANA', description: 'Solana is a decentralized blockchain built to enable scalable, user-friendly apps for the world. With high throughput and ultra-low fees, it provides the ideal foundation for institutional-grade digital assets.' },
-        { name: 'Aave', description: 'Aave is a decentralized non-custodial liquidity protocol where users can participate as depositors or borrowers. depositors provide liquidity to the market to earn a passive income.' },
-        { name: 'AGORA', description: 'Agora is an institutional-grade stablecoin issuance platform. It provides the necessary infrastructure for reliable, fiat-backed digital dollars that power global commerce and decentralized finance.' },
-        { name: 'Hex Trust', description: 'Hex Trust is the leading institutional-grade digital asset custodian. Fully licensed and regulated, it provides bank-level security for digital assets across the globe.' },
-        { name: 'ITCENGLOBAL', description: 'ITCENGLOBAL is a strategic partner in digital commodity trading, bridging the gap between traditional resources and blockchain-based settlement solutions.' },
-        { name: 'MONAD', description: 'Monad is a high-performance Ethereum-compatible L1 blockchain, optimized for ultra-high throughput and parallel execution, enabling a new generation of decentralized applications.' },
-    ], []);
-
-    useEffect(() => {
-        const container = scrollContainerRef.current;
-        if (!container) return;
-
-        const animate = () => {
-            if (!container) return;
-
-            // LERP for smooth scroll
-            const diff = targetScrollRef.current - currentScrollRef.current;
-            currentScrollRef.current += diff * 0.1; // Balanced speed (previously 0.15)
-            container.scrollTop = currentScrollRef.current;
-
-            // Update selection state ONLY if not doing an intentional click-scroll
-            if (!isClickScrollingRef.current) {
-                const isSmall = window.innerWidth < 1024;
-                const targetSelectionY = isSmall ? 100 : 393;
-                const containerRect = container.getBoundingClientRect();
-
-                let closestIdx = 0;
-                let minDistance = Infinity;
-
-                itemRefs.current.forEach((ref, index) => {
-                    if (!ref) return;
-                    const rect = ref.getBoundingClientRect();
-                    const itemTopRelativeToContainer = rect.top - containerRect.top;
-
-                    const distance = Math.abs(itemTopRelativeToContainer - targetSelectionY);
-                    if (distance < minDistance) {
-                        minDistance = distance;
-                        closestIdx = index;
-                    }
-                });
-
-                if (closestIdx !== selectedIdxRef.current) {
-                    selectedIdxRef.current = closestIdx;
-                    setSelectedIdx(closestIdx);
-                }
-            }
-
-            // Stop condition
-            if (Math.abs(diff) < 0.1) {
-                currentScrollRef.current = targetScrollRef.current;
-                container.scrollTop = currentScrollRef.current;
-                isAnimatingRef.current = false;
-                isClickScrollingRef.current = false; // Reset lock
-                return;
-            }
-
-            requestAnimationFrame(animate);
-        };
-
-        const startAnimation = () => {
-            if (!isAnimatingRef.current) {
-                isAnimatingRef.current = true;
-                requestAnimationFrame(animate);
-            }
-        };
-
-        const startSnap = () => {
-            isClickScrollingRef.current = false; // Snapping is part of wheel-flow, so don't lock
-            const isSmall = window.innerWidth < 1024;
-            const itemHeightWithGap = isSmall ? (40 + 32) : (57 + 48);
-            const nearestIdx = Math.round(targetScrollRef.current / itemHeightWithGap);
-            const clampedIdx = Math.max(0, Math.min(nearestIdx, PARTNERS.length - 1));
-            targetScrollRef.current = clampedIdx * itemHeightWithGap;
-            startAnimation();
-        };
-
-        const handleWheel = (e: WheelEvent) => {
-            e.preventDefault();
-            isClickScrollingRef.current = false; // Wheel breaks click-lock
-            const damping = 0.4; // Reduced sensitivity
-            const maxScroll = container.scrollHeight - container.clientHeight;
-            targetScrollRef.current = Math.max(0, Math.min(targetScrollRef.current + e.deltaY * damping, maxScroll));
-
-            startAnimation();
-
-            // Auto-snap logic after scroll stop
-            if (wheelTimeoutRef.current) clearTimeout(wheelTimeoutRef.current);
-            wheelTimeoutRef.current = setTimeout(startSnap, 150);
-        };
-
-        // Click handler inside effect to keep it stable
-        const handleItemClickInternal = (index: number) => {
-            isClickScrollingRef.current = true; // Lock selection for this movement
-            setSelectedIdx(index); // Immediate feedback
-            selectedIdxRef.current = index;
-
-            const isSmall = window.innerWidth < 1024;
-            const itemHeightWithGap = isSmall ? (40 + 32) : (57 + 48);
-            targetScrollRef.current = index * itemHeightWithGap;
-            startAnimation();
-        };
-
-        // Expose to window for the onClick handler to call
-        (container as any)._handleClick = handleItemClickInternal;
-
-        container.addEventListener('wheel', handleWheel, { passive: false });
-
-        return () => {
-            container.removeEventListener('wheel', handleWheel);
-        };
-    }, [PARTNERS.length]); // Empty dependency array is critical
 
     return (
-        <section className="w-full bg-black flex justify-center overflow-hidden">
-            <div className="w-full max-w-[1440px] min-h-[900px] relative bg-black flex flex-col lg:block items-center py-20 lg:py-0 px-6 lg:px-0">
+        <section className="w-full bg-black flex justify-center overflow-hidden h-[908px] md:h-auto">
+            <div className="w-full max-w-[1440px] h-full relative md:min-h-[900px]">
 
-                {/* 1. Gradient Overlay (735x900) - Very left and on top of picker (z-20) */}
-                <div
-                    className="absolute z-20 pointer-events-none hidden lg:block"
-                    style={{
-                        width: '735px',
-                        height: '100%',
-                        left: '0',
-                        top: '0',
-                        background: 'linear-gradient(to bottom, #000000 0%, rgba(0,0,0,0) 22%, rgba(0,0,0,0) 78%, #000000 100%)'
-                    }}
-                />
-
-                {/* 2. Content Area */}
-                <div
-                    className="flex flex-col items-center lg:items-start lg:absolute lg:z-10 w-full lg:w-[505px] h-auto lg:h-100% lg:left-[835px] lg:top-0"
-                >
-                    {/* "Partners" Title */}
-                    <div
-                        className="font-serif text-[32px] md:text-[54px] font-normal text-white leading-tight lg:absolute lg:top-[100px]"
-                    >
+                {/* --- Mobile View (393px Target) --- */}
+                <div className="flex md:hidden flex-col items-center w-full h-full pt-[107px]">
+                    {/* 1. Headline */}
+                    <h2 className="font-serif text-[42px] font-normal text-white text-center">
                         Partners
-                    </div>
+                    </h2>
 
-                    {/* Logo and Description Wrap (For stacking order on mobile) */}
-                    <div className="flex flex-col items-center lg:items-start w-full contents md:block">
-                        {/* Partner Logo Placeholder - Bottom edge at 450px */}
-                        <div
-                            className="bg-zinc-900 flex items-center justify-center border border-zinc-800 mt-12 lg:mt-0 lg:absolute lg:top-[386px] w-[200px] md:w-[245px] h-[52px] md:h-[64px]"
-                        >
-                            <span className="text-zinc-600 text-[10px] md:text-[12px]">Partner Logo ({PARTNERS[selectedIdx]?.name})</span>
+                    {/* 2. Marquee Rows */}
+                    <div className="mt-[100px] flex flex-col gap-[32px] w-full overflow-hidden">
+                        {/* Row 1 (L->R) */}
+                        <div className="relative flex whitespace-nowrap overflow-hidden">
+                            <div className="flex gap-[16px] animate-marquee-ltr-fast">
+                                {[...PARTNERS, ...PARTNERS].map((partner, idx) => (
+                                    <PartnerItem
+                                        key={idx}
+                                        name={partner.name}
+                                        isActive={PARTNERS[selectedIdx].name === partner.name}
+                                        onClick={() => setSelectedIdx(idx % PARTNERS.length)}
+                                    />
+                                ))}
+                            </div>
                         </div>
 
-                        {/* Partner Description - Top at 450px + 32px */}
-                        <div
-                            className="font-sans text-[16px] md:text-[20px] font-normal text-white leading-[24px] md:leading-[28px] transition-all duration-300 mt-6 lg:mt-0 lg:absolute lg:top-[482px] w-full max-w-[421px] text-center lg:text-left h-auto min-h-[112px]"
-                        >
-                            {PARTNERS[selectedIdx]?.description}
+                        {/* Row 2 (R->L slow) */}
+                        <div className="relative flex whitespace-nowrap overflow-hidden">
+                            <div className="flex gap-[16px] animate-marquee-rtl-slow">
+                                {[...PARTNERS, ...PARTNERS].map((partner, idx) => (
+                                    <PartnerItem
+                                        key={idx}
+                                        name={partner.name}
+                                        isActive={PARTNERS[selectedIdx].name === partner.name}
+                                        onClick={() => setSelectedIdx(idx % PARTNERS.length)}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Row 3 (L->R slow) */}
+                        <div className="relative flex whitespace-nowrap overflow-hidden">
+                            <div className="flex gap-[16px] animate-marquee-ltr-slow">
+                                {[...PARTNERS, ...PARTNERS].map((partner, idx) => (
+                                    <PartnerItem
+                                        key={idx}
+                                        name={partner.name}
+                                        isActive={PARTNERS[selectedIdx].name === partner.name}
+                                        onClick={() => setSelectedIdx(idx % PARTNERS.length)}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* 3. Info Card */}
+                    <div className="mt-[80px] w-full h-[270px] px-[32px] flex flex-col">
+                        <div className="w-full h-full flex flex-col items-start">
+                            {/* Partner Logo */}
+                            <div className="relative w-[198px] h-[52px] flex items-center justify-start mb-6">
+                                <div className="w-full h-full bg-white/5 flex items-center justify-center rounded">
+                                    <span className="text-white font-serif text-lg">{PARTNERS[selectedIdx].name}</span>
+                                </div>
+                            </div>
+
+                            {/* Partner Info Text */}
+                            <div className="">
+                                <p className="font-sans font-light text-[20px] text-[#fafafa] leading-[1.3] text-left">
+                                    {PARTNERS[selectedIdx].name} provides innovative DeFi infrastructure, enabling reliable settlement by bridging digital assets with traditional resources across global markets.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* 3. Scrollable Picker Container - Right edge fixed at 766px from section right */}
-                <div
-                    ref={scrollContainerRef}
-                    className="relative lg:absolute z-15 flex flex-col items-center lg:items-end overflow-hidden scrollbar-hide mt-16 lg:mt-0 lg:right-[766px] lg:top-0 w-full lg:w-[469px] h-[300px] lg:h-[100%]"
-                    style={{ scrollbarWidth: 'none' }}
-                >
-                    {/* Spacer for top */}
-                    <div className="flex-shrink-0" style={{ height: isMobile ? '100px' : '393px' }} />
+                {/* --- Desktop View (Original 12-col / Picker) --- */}
+                <div className="hidden md:flex flex-col lg:block items-center md:min-h-[900px] w-full">
+                    {/* 1. Gradient Overlay */}
+                    <div
+                        className="absolute z-20 pointer-events-none hidden lg:block"
+                        style={{
+                            width: '735px',
+                            height: '100%',
+                            left: '0',
+                            top: '0',
+                            background: 'linear-gradient(to bottom, #000000 0%, rgba(0,0,0,0) 22%, rgba(0,0,0,0) 78%, #000000 100%)'
+                        }}
+                    />
 
-                    <div className="flex flex-col items-center lg:items-end w-full gap-[32px] lg:gap-[48px]">
-                        {PARTNERS.map((partner, index) => {
-                            const isSelected = selectedIdx === index;
-                            return (
-                                <div
-                                    key={index}
-                                    ref={el => { itemRefs.current[index] = el; }}
-                                    className="flex flex-col items-center lg:items-end group"
-                                    style={{
-                                        width: 'fit-content',
-                                        height: isMobile ? '40px' : '57px',
-                                        cursor: 'pointer',
-                                        position: 'relative',
-                                    }}
-                                    onClick={() => (scrollContainerRef.current as any)?._handleClick?.(index)}
-                                >
-                                    <div
-                                        className="flex items-center justify-center lg:justify-end px-2 py-2"
-                                        style={{ height: isMobile ? '40px' : '57px', position: 'relative' }}
-                                    >
-                                        <span
-                                            className={`font-serif text-[28px] lg:text-[40px] leading-none text-center lg:text-right font-light transition-colors duration-500 ${isSelected ? 'text-[#F0B118]' : 'text-white'}`}
-                                        >
-                                            {partner.name}
-                                        </span>
-
-                                        {/* Drawing Stroke Animation */}
-                                        <div
-                                            className="absolute bottom-0 left-2 right-2 h-[1.5px] md:h-[2px] bg-[#F0B118]"
-                                            style={{
-                                                width: isSelected ? 'calc(100% - 16px)' : '0%',
-                                                opacity: isSelected ? 1 : 0,
-                                                transformOrigin: 'center lg:left',
-                                                transition: 'width 0.7s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s'
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                            );
-                        })}
+                    {/* 2. Content Area */}
+                    <div className="flex flex-col items-center lg:items-start lg:absolute lg:z-10 w-full lg:w-[505px] h-auto lg:h-full lg:left-[835px] lg:top-0">
+                        <div className="font-serif text-[54px] font-normal text-white leading-tight lg:absolute lg:top-[100px]">
+                            Partners
+                        </div>
+                        <div className="flex flex-col items-center lg:items-start w-full mt-24 lg:mt-0 lg:absolute lg:top-[386px]">
+                            <div className="bg-zinc-900 flex items-center justify-center border border-zinc-800 w-[245px] h-[64px]">
+                                <span className="text-zinc-600 text-[12px]">Partner Logo ({PARTNERS[selectedIdx % PARTNERS.length]?.name})</span>
+                            </div>
+                            <div className="font-sans text-[20px] font-normal text-white leading-[28px] mt-6 w-full max-w-[421px] text-center lg:text-left h-auto min-h-[112px]">
+                                {PARTNERS[selectedIdx % PARTNERS.length]?.description}
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Spacer for bottom */}
-                    <div className="flex-shrink-0" style={{ height: isMobile ? '150px' : 'calc(900px - 393px - 57px)' }} />
+                    {/* 3. Vertical Picker (Desktop Placeholder / Link) */}
+                    <div className="hidden lg:flex absolute z-15 flex-col items-end overflow-hidden right-[766px] top-0 w-[469px] h-full">
+                        <div className="flex flex-col items-end w-full gap-[48px] mt-[393px]">
+                            {PARTNERS.map((partner, index) => (
+                                <div
+                                    key={index}
+                                    onClick={() => setSelectedIdx(index)}
+                                    className="cursor-pointer group flex flex-col items-end"
+                                >
+                                    <span className={`font-serif text-[40px] leading-none text-right font-light transition-colors ${selectedIdx === index ? 'text-[#F0B118]' : 'text-white'}`}>
+                                        {partner.name}
+                                    </span>
+                                    <div className={`mt-2 h-[1px] bg-[#F0B118] transition-all duration-500 ${selectedIdx === index ? 'w-full' : 'w-0'}`} />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <style jsx global>{`
-                .scrollbar-hide::-webkit-scrollbar {
-                    display: none;
+                @keyframes marquee-ltr {
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(-50%); }
+                }
+                @keyframes marquee-rtl {
+                    0% { transform: translateX(-50%); }
+                    100% { transform: translateX(0); }
+                }
+                .animate-marquee-ltr-fast {
+                    animation: marquee-ltr 25s linear infinite;
+                }
+                .animate-marquee-ltr-slow {
+                    animation: marquee-ltr 35s linear infinite;
+                }
+                .animate-marquee-rtl-slow {
+                    animation: marquee-rtl 45s linear infinite;
                 }
             `}</style>
         </section>
+    );
+}
+
+function PartnerItem({ name, isActive, onClick }: { name: string, isActive: boolean, onClick: () => void }) {
+    return (
+        <div
+            onClick={onClick}
+            className="flex flex-col items-center cursor-pointer py-[3px]"
+        >
+            <span
+                className={`font-serif text-[28px] font-normal leading-[36px] px-[8px] transition-colors duration-300 ${isActive ? 'text-[#F0B118]' : 'text-white'}`}
+            >
+                {name}
+            </span>
+            <div className={`w-full h-[1px] transition-colors duration-300 ${isActive ? 'bg-[#F0B118]' : 'bg-white'}`} />
+        </div>
     );
 }

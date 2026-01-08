@@ -73,7 +73,8 @@ export default function BenefitsSection() {
                             style={{
                                 scrollSnapType: 'x mandatory',
                                 scrollbarWidth: 'none',
-                                msOverflowStyle: 'none'
+                                msOverflowStyle: 'none',
+                                paddingRight: 'max(20px, calc(100vw - 315px))' // Ensure last item can snap to start
                             }}
                         >
                             {BENEFITS.map((benefit, index) => (
