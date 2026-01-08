@@ -39,7 +39,7 @@ function ContactInput({ label, isLarge }: ContactInputProps) {
 
             {isLarge ? (
                 <textarea
-                    ref={inputRef as React.RefObject<HTMLTextAreaElement>}
+                    ref={inputRef as any}
                     className={`w-full bg-transparent border-none outline-none text-white font-sans text-[23px] font-light p-0 m-0 resize-none h-[100px] transition-opacity duration-300 ${active ? 'opacity-100' : 'opacity-0 h-0 pointer-events-none'}`}
                     style={{ fontFamily: 'var(--font-pretendard)' }}
                     value={value}
@@ -49,7 +49,7 @@ function ContactInput({ label, isLarge }: ContactInputProps) {
                 />
             ) : (
                 <input
-                    ref={inputRef as React.RefObject<HTMLInputElement>}
+                    ref={inputRef as any}
                     type="text"
                     className={`w-full bg-transparent border-none outline-none text-white font-sans text-[23px] font-light p-0 m-0 transition-opacity duration-300 ${active ? 'opacity-100' : 'opacity-0 h-0 pointer-events-none'}`}
                     style={{ fontFamily: 'var(--font-pretendard)' }}
@@ -67,39 +67,33 @@ export default function ContactSection() {
     const [submitHover, setSubmitHover] = useState(false);
     return (
         <section className="w-full bg-black flex justify-center overflow-hidden">
-            <div className="w-full max-w-[1440px] h-[900px] relative bg-black">
+            <div className="w-full max-w-[1440px] min-h-[900px] relative bg-black flex flex-col lg:block items-center py-20 lg:py-0">
 
-                {/* Left Side Content - Aligned to 2nd column (205px from left) */}
+                {/* Left Side Content */}
                 <div
-                    className="absolute z-10 flex flex-col items-start"
-                    style={{
-                        left: '205px',
-                        top: '160px',
-                        width: '505px'
-                    }}
+                    className="flex flex-col items-start px-6 lg:px-0 lg:absolute lg:z-10 lg:left-[205px] lg:top-[160px] w-full lg:w-[505px]"
                 >
                     {/* "Contact Us" Title */}
                     <h2
-                        className="w-full font-serif text-[54px] font-normal text-white leading-tight"
+                        className="w-full font-serif text-[32px] md:text-[54px] font-normal text-white leading-tight"
                     >
                         Contact Us
                     </h2>
 
-                    {/* Contact Info Group - 60px gap from title */}
+                    {/* Contact Info Group */}
                     <div
-                        className="w-full flex flex-col items-start"
-                        style={{ marginTop: '60px', gap: '40px' }}
+                        className="w-full flex flex-col items-start mt-10 lg:mt-[60px] gap-8 lg:gap-[40px]"
                     >
                         {/* Address */}
-                        <div className="w-full flex flex-col items-start" style={{ gap: '8px', height: '86px' }}>
+                        <div className="w-full flex flex-col items-start gap-2 lg:h-[86px]">
                             <span
-                                className="w-full font-sans text-[20px] font-normal text-[#f2f2f2]"
+                                className="w-full font-sans text-[18px] md:text-[20px] font-normal text-[#f2f2f2]"
                                 style={{ fontFamily: 'var(--font-pretendard)' }}
                             >
                                 Address
                             </span>
                             <p
-                                className="w-full font-sans text-[18px] font-light text-[#f2f2f2] leading-[1.5]"
+                                className="w-full font-sans text-[16px] md:text-[18px] font-light text-[#f2f2f2] leading-[1.5]"
                                 style={{ fontFamily: 'var(--font-pretendard)' }}
                             >
                                 5, Yeongdong-daero 106-gil,<br />
@@ -108,15 +102,15 @@ export default function ContactSection() {
                         </div>
 
                         {/* Tel. */}
-                        <div className="w-full flex flex-col items-start" style={{ gap: '8px', height: '59px' }}>
+                        <div className="w-full flex flex-col items-start gap-2 lg:h-[59px]">
                             <span
-                                className="w-full font-sans text-[20px] font-normal text-[#f2f2f2]"
+                                className="w-full font-sans text-[18px] md:text-[20px] font-normal text-[#f2f2f2]"
                                 style={{ fontFamily: 'var(--font-pretendard)' }}
                             >
                                 Tel.
                             </span>
                             <p
-                                className="w-full font-sans text-[18px] font-light text-[#f2f2f2] leading-[1.5]"
+                                className="w-full font-sans text-[16px] md:text-[18px] font-light text-[#f2f2f2] leading-[1.5]"
                                 style={{ fontFamily: 'var(--font-pretendard)' }}
                             >
                                 010-9876-1515
@@ -124,15 +118,15 @@ export default function ContactSection() {
                         </div>
 
                         {/* E-mail */}
-                        <div className="w-full flex flex-col items-start" style={{ gap: '8px', height: '59px' }}>
+                        <div className="w-full flex flex-col items-start gap-2 lg:h-[59px]">
                             <span
-                                className="w-full font-sans text-[20px] font-normal text-[#f2f2f2]"
+                                className="w-full font-sans text-[18px] md:text-[20px] font-normal text-[#f2f2f2]"
                                 style={{ fontFamily: 'var(--font-pretendard)' }}
                             >
                                 E-mail
                             </span>
                             <p
-                                className="w-full font-sans text-[18px] font-light text-[#f2f2f2] leading-[1.5]"
+                                className="w-full font-sans text-[16px] md:text-[18px] font-light text-[#f2f2f2] leading-[1.5]"
                                 style={{ fontFamily: 'var(--font-pretendard)' }}
                             >
                                 rae@arkpoint.kr
@@ -141,35 +135,26 @@ export default function ContactSection() {
                     </div>
                 </div>
 
-                {/* Right Side - Form Container - Increased z-index to 20 */}
+                {/* Right Side - Form Container */}
                 <div
-                    className="absolute z-20 flex flex-col items-end"
-                    style={{
-                        left: '815px',
-                        top: '175px',
-                        width: '420px',
-                    }}
+                    className="flex flex-col items-end w-full lg:w-[420px] px-6 lg:px-0 mt-20 lg:mt-0 lg:absolute lg:z-20 lg:left-[815px] lg:top-[175px]"
                 >
                     {/* Inputs Group */}
-                    <div className="w-full flex flex-col items-start" style={{ gap: '33px' }}>
+                    <div className="w-full flex flex-col items-start gap-[33px]">
                         <ContactInput label="Email Address *" />
                         <ContactInput label="Name *" />
                         <ContactInput label="Message" isLarge />
                     </div>
 
-                    {/* Submit Button - 120px gap from message - Increased z-index to 30 */}
+                    {/* Submit Button */}
                     <div
-                        className="flex items-center cursor-pointer relative z-30"
-                        style={{
-                            marginTop: '120px',
-                            gap: '20px'
-                        }}
+                        className="flex items-center cursor-pointer relative z-30 mt-20 lg:mt-[120px] gap-5"
                         onMouseEnter={() => setSubmitHover(true)}
                         onMouseLeave={() => setSubmitHover(false)}
                     >
                         <div className="relative">
                             <span
-                                className="font-sans text-[24px] font-light text-white block"
+                                className="font-sans text-[20px] md:text-[24px] font-light text-white block"
                                 style={{ fontFamily: 'var(--font-pretendard)' }}
                             >
                                 Submit
@@ -178,8 +163,8 @@ export default function ContactSection() {
                                 className={`absolute bottom-0 left-0 h-[1.5px] bg-[#F0B118] transition-all duration-300 ease-in-out ${submitHover ? 'w-full' : 'w-0'}`}
                             />
                         </div>
-                        {/* 50*50 Arrow Icon */}
-                        <div className="w-[50px] h-[50px] relative">
+                        {/* Arrow Icon */}
+                        <div className="w-[40px] md:w-[50px] h-[40px] md:h-[50px] relative">
                             <Image
                                 src="/images/section5-arrow.svg"
                                 alt="Arrow"

@@ -1,12 +1,40 @@
+"use client";
+
 import Image from "next/image";
+import { useState, useRef, useEffect } from "react";
 
 export default function BenefitsSection() {
+    const [activeIndex, setActiveIndex] = useState(0);
+    const scrollRef = useRef<HTMLDivElement>(null);
+
+    const handleScroll = () => {
+        if (!scrollRef.current) return;
+        const scrollPosition = scrollRef.current.scrollLeft;
+        const cardWidth = 295 + 18; // Card width + gap
+        const newIndex = Math.round(scrollPosition / cardWidth);
+        if (newIndex !== activeIndex) {
+            setActiveIndex(newIndex);
+        }
+    };
+
     return (
-        <section className="w-full bg-black flex justify-center overflow-hidden">
-            <div className="w-full max-w-[1440px] h-[920px] relative">
-                {/* Background Image */}
+        <section className="w-full bg-black flex justify-center overflow-hidden h-[852px] md:h-auto">
+            <div className="w-full max-w-[1440px] h-full relative md:py-20 md:min-h-[920px]">
+                {/* Mobile Background */}
+                <div className="absolute inset-0 md:hidden z-0">
+                    <Image
+                        src="/images/mobile-section3-bg.png"
+                        alt="Benefits Background"
+                        fill
+                        priority
+                        className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/50" />
+                </div>
+
+                {/* Desktop Background Image - Hidden on mobile */}
                 <div
-                    className="absolute"
+                    className="absolute hidden md:block"
                     style={{
                         top: '75px',
                         left: '142px',
@@ -25,41 +53,87 @@ export default function BenefitsSection() {
                     />
                 </div>
 
-                {/* 12-column Grid Container */}
-                <div
-                    className="grid grid-cols-12 w-full h-full absolute inset-0 z-10"
-                    style={{
-                        paddingLeft: '100px',
-                        paddingRight: '100px',
-                        columnGap: '20px'
-                    }}
-                >
-                    {/* Heading Text - 6th column, 144px from top */}
-                    <div
-                        className="col-start-6 col-span-7 flex flex-col"
-                        style={{ paddingTop: '144px' }}
-                    >
-                        <h2 className="font-serif text-[40px] font-normal text-white leading-tight">
-                            How does <span className="text-[#F0B118]">AGLD</span> differentiate itself <br />
-                            with exclusive benefits?
+                {/* Content Container */}
+                <div className="relative z-10 w-full flex flex-col pt-[113px] md:pt-0 md:px-[100px]">
+                    {/* Heading Text */}
+                    <div className="w-full md:w-auto md:ml-[420px] md:pt-[64px] px-0">
+                        <h2 className="font-serif text-[28px] md:text-[40px] font-normal text-white leading-[40px] md:leading-tight text-center md:text-left">
+                            How does <span className="text-[#F0B118]">AGLD</span> <br className="md:hidden" />
+                            differentiate itself with <br className="md:hidden" />
+                            exclusive benefits?
                         </h2>
                     </div>
 
-                    {/* Benefit Cards Container - Exactly 339px from top */}
+                    {/* Mobile Carousel - Horizontal Scroll */}
+                    <div className="md:hidden mt-[52px] ml-[20px]">
+                        <div
+                            ref={scrollRef}
+                            onScroll={handleScroll}
+                            className="flex overflow-x-auto scrollbar-hide gap-[18px]"
+                            style={{
+                                scrollSnapType: 'x mandatory',
+                                scrollbarWidth: 'none',
+                                msOverflowStyle: 'none'
+                            }}
+                        >
+                            {BENEFITS.map((benefit, index) => (
+                                <div
+                                    key={index}
+                                    className="flex-shrink-0 flex flex-col w-[295px] min-h-[431px] bg-[#8d8d8d]/50 p-[30px_20px]"
+                                    style={{ scrollSnapAlign: 'start' }}
+                                >
+                                    <div className="w-[40px] h-[40px] relative mb-[39px]">
+                                        <Image
+                                            src={benefit.icon}
+                                            alt={benefit.title.replace('<br />', ' ')}
+                                            fill
+                                            className="object-contain"
+                                        />
+                                    </div>
+                                    <h3
+                                        className="font-serif text-[32px] font-normal text-white leading-[35px] flex items-end"
+                                        style={{
+                                            minHeight: '70px',
+                                            marginBottom: '30px'
+                                        }}
+                                        dangerouslySetInnerHTML={{ __html: benefit.title }}
+                                    />
+                                    <p
+                                        className="text-[16px] text-[#e6e6e6] leading-[1.4]"
+                                        style={{
+                                            fontFamily: 'var(--font-pretendard)',
+                                            fontWeight: 220,
+                                            wordBreak: 'keep-all'
+                                        }}
+                                    >
+                                        {benefit.description}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Mobile Page Indicator */}
+                        <div className="mt-[24px] flex justify-center mr-[20px]">
+                            <div className="inline-flex items-center gap-[6px] px-[6px] py-[4px]">
+                                {BENEFITS.map((_, index) => (
+                                    <div
+                                        key={index}
+                                        className={`h-[2px] rounded-[30px] transition-all duration-300 ${activeIndex === index ? 'w-[50px] bg-white' : 'w-[18px] bg-[#a1a1a1]'
+                                            }`}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Desktop Benefit Cards Grid */}
                     <div
-                        className="col-span-12 grid grid-cols-4 gap-[20px] absolute"
-                        style={{ top: '339px', left: '100px', right: '100px' }}
+                        className="hidden md:grid grid-cols-4 gap-[20px] mt-[155px]"
                     >
                         {BENEFITS.map((benefit, index) => (
                             <div
                                 key={index}
-                                className="flex flex-col"
-                                style={{
-                                    width: '295px',
-                                    height: '431px',
-                                    backgroundColor: 'rgba(141, 141, 141, 0.5)',
-                                    padding: '30px 20px'
-                                }}
+                                className="flex flex-col w-full min-h-[431px] bg-[#8d8d8d]/50 p-[30px_20px]"
                             >
                                 <div className="w-[40px] h-[40px] relative mb-[39px]">
                                     <Image
@@ -72,13 +146,13 @@ export default function BenefitsSection() {
                                 <h3
                                     className="font-serif text-[32px] font-normal text-white leading-[35px] flex items-end"
                                     style={{
-                                        height: index === 0 ? '35px' : '70px',
-                                        marginBottom: index === 0 ? '65px' : '30px'
+                                        minHeight: '70px',
+                                        marginBottom: '30px'
                                     }}
                                     dangerouslySetInnerHTML={{ __html: benefit.title }}
                                 />
                                 <p
-                                    className="text-[16px] text-[#e6e6e6] leading-[19px]"
+                                    className="text-[16px] text-[#e6e6e6] leading-[1.4]"
                                     style={{
                                         fontFamily: 'var(--font-pretendard)',
                                         fontWeight: 220,
@@ -92,6 +166,16 @@ export default function BenefitsSection() {
                     </div>
                 </div>
             </div>
+
+            <style jsx global>{`
+                .scrollbar-hide::-webkit-scrollbar {
+                    display: none;
+                }
+                .scrollbar-hide {
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
+                }
+            `}</style>
         </section>
     );
 }

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useMemo } from "react";
 
 export default function PartnersSection() {
     const [selectedIdx, setSelectedIdx] = useState(0);
+    const [isMobile, setIsMobile] = useState(false);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -14,6 +15,13 @@ export default function PartnersSection() {
     const isAnimatingRef = useRef(false);
     const isClickScrollingRef = useRef(false); // New lock for click-scroll
     const wheelTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+        setIsMobile(window.innerWidth < 1024);
+        const handleResize = () => setIsMobile(window.innerWidth < 1024);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const PARTNERS = useMemo(() => [
         { name: 'Aave', description: 'Aave is a decentralized non-custodial liquidity protocol where users can participate as depositors or borrowers. depositors provide liquidity to the market to earn a passive income.' },
@@ -43,7 +51,8 @@ export default function PartnersSection() {
 
             // Update selection state ONLY if not doing an intentional click-scroll
             if (!isClickScrollingRef.current) {
-                const targetSelectionY = 393;
+                const isSmall = window.innerWidth < 1024;
+                const targetSelectionY = isSmall ? 100 : 393;
                 const containerRect = container.getBoundingClientRect();
 
                 let closestIdx = 0;
@@ -88,7 +97,8 @@ export default function PartnersSection() {
 
         const startSnap = () => {
             isClickScrollingRef.current = false; // Snapping is part of wheel-flow, so don't lock
-            const itemHeightWithGap = 57 + 48;
+            const isSmall = window.innerWidth < 1024;
+            const itemHeightWithGap = isSmall ? (40 + 32) : (57 + 48);
             const nearestIdx = Math.round(targetScrollRef.current / itemHeightWithGap);
             const clampedIdx = Math.max(0, Math.min(nearestIdx, PARTNERS.length - 1));
             targetScrollRef.current = clampedIdx * itemHeightWithGap;
@@ -115,7 +125,9 @@ export default function PartnersSection() {
             setSelectedIdx(index); // Immediate feedback
             selectedIdxRef.current = index;
 
-            targetScrollRef.current = index * (57 + 48);
+            const isSmall = window.innerWidth < 1024;
+            const itemHeightWithGap = isSmall ? (40 + 32) : (57 + 48);
+            targetScrollRef.current = index * itemHeightWithGap;
             startAnimation();
         };
 
@@ -127,15 +139,15 @@ export default function PartnersSection() {
         return () => {
             container.removeEventListener('wheel', handleWheel);
         };
-    }, []); // Empty dependency array is critical
+    }, [PARTNERS.length]); // Empty dependency array is critical
 
     return (
         <section className="w-full bg-black flex justify-center overflow-hidden">
-            <div className="w-full max-w-[1440px] h-[900px] relative bg-black">
+            <div className="w-full max-w-[1440px] min-h-[900px] relative bg-black flex flex-col lg:block items-center py-20 lg:py-0 px-6 lg:px-0">
 
                 {/* 1. Gradient Overlay (735x900) - Very left and on top of picker (z-20) */}
                 <div
-                    className="absolute z-20 pointer-events-none"
+                    className="absolute z-20 pointer-events-none hidden lg:block"
                     style={{
                         width: '735px',
                         height: '100%',
@@ -145,100 +157,77 @@ export default function PartnersSection() {
                     }}
                 />
 
-                {/* 2. Right Side Content - Aligned to 8th column (835px from left of 1440px) */}
+                {/* 2. Content Area */}
                 <div
-                    className="absolute z-10 flex flex-col items-start"
-                    style={{
-                        left: '835px',
-                        top: '0',
-                        width: '505px',
-                        height: '100%'
-                    }}
+                    className="flex flex-col items-center lg:items-start lg:absolute lg:z-10 w-full lg:w-[505px] h-auto lg:h-100% lg:left-[835px] lg:top-0"
                 >
                     {/* "Partners" Title */}
                     <div
-                        className="font-serif text-[54px] font-normal text-white leading-tight"
-                        style={{ position: 'absolute', top: '100px' }}
+                        className="font-serif text-[32px] md:text-[54px] font-normal text-white leading-tight lg:absolute lg:top-[100px]"
                     >
                         Partners
                     </div>
 
-                    {/* Partner Logo Placeholder - Bottom edge at 450px */}
-                    <div
-                        className="bg-zinc-900 flex items-center justify-center border border-zinc-800"
-                        style={{
-                            position: 'absolute',
-                            top: '386px',
-                            width: '245px',
-                            height: '64px'
-                        }}
-                    >
-                        <span className="text-zinc-600 text-[12px]">Partner Logo (245x64)</span>
-                    </div>
+                    {/* Logo and Description Wrap (For stacking order on mobile) */}
+                    <div className="flex flex-col items-center lg:items-start w-full contents md:block">
+                        {/* Partner Logo Placeholder - Bottom edge at 450px */}
+                        <div
+                            className="bg-zinc-900 flex items-center justify-center border border-zinc-800 mt-12 lg:mt-0 lg:absolute lg:top-[386px] w-[200px] md:w-[245px] h-[52px] md:h-[64px]"
+                        >
+                            <span className="text-zinc-600 text-[10px] md:text-[12px]">Partner Logo ({PARTNERS[selectedIdx]?.name})</span>
+                        </div>
 
-                    {/* Partner Description - Top at 450px + 32px */}
-                    <div
-                        className="font-sans text-[20px] font-normal text-white leading-[28px] transition-all duration-300"
-                        style={{
-                            position: 'absolute',
-                            top: '482px',
-                            width: '421px',
-                            height: '112px',
-                            overflow: 'hidden'
-                        }}
-                    >
-                        {PARTNERS[selectedIdx]?.description}
+                        {/* Partner Description - Top at 450px + 32px */}
+                        <div
+                            className="font-sans text-[16px] md:text-[20px] font-normal text-white leading-[24px] md:leading-[28px] transition-all duration-300 mt-6 lg:mt-0 lg:absolute lg:top-[482px] w-full max-w-[421px] text-center lg:text-left h-auto min-h-[112px]"
+                        >
+                            {PARTNERS[selectedIdx]?.description}
+                        </div>
                     </div>
                 </div>
 
                 {/* 3. Scrollable Picker Container - Right edge fixed at 766px from section right */}
                 <div
                     ref={scrollContainerRef}
-                    className="absolute z-15 flex flex-col items-end overflow-hidden scrollbar-hide"
-                    style={{
-                        right: '766px',
-                        top: '0',
-                        width: '469px',
-                        height: '100%',
-                        scrollbarWidth: 'none',
-                    }}
+                    className="relative lg:absolute z-15 flex flex-col items-center lg:items-end overflow-hidden scrollbar-hide mt-16 lg:mt-0 lg:right-[766px] lg:top-0 w-full lg:w-[469px] h-[300px] lg:h-[100%]"
+                    style={{ scrollbarWidth: 'none' }}
                 >
                     {/* Spacer for top */}
-                    <div style={{ height: '393px', flexShrink: 0 }} />
+                    <div className="flex-shrink-0" style={{ height: isMobile ? '100px' : '393px' }} />
 
-                    <div className="flex flex-col items-end w-full gap-[48px]">
+                    <div className="flex flex-col items-center lg:items-end w-full gap-[32px] lg:gap-[48px]">
                         {PARTNERS.map((partner, index) => {
                             const isSelected = selectedIdx === index;
                             return (
                                 <div
                                     key={index}
                                     ref={el => { itemRefs.current[index] = el; }}
-                                    className="flex flex-col items-end group"
+                                    className="flex flex-col items-center lg:items-end group"
                                     style={{
                                         width: 'fit-content',
-                                        height: '57px',
+                                        height: isMobile ? '40px' : '57px',
                                         cursor: 'pointer',
                                         position: 'relative',
                                     }}
                                     onClick={() => (scrollContainerRef.current as any)?._handleClick?.(index)}
                                 >
                                     <div
-                                        className="flex items-center justify-end px-2 py-2"
-                                        style={{ height: '57px', position: 'relative' }}
+                                        className="flex items-center justify-center lg:justify-end px-2 py-2"
+                                        style={{ height: isMobile ? '40px' : '57px', position: 'relative' }}
                                     >
                                         <span
-                                            className={`font-serif text-[40px] leading-none text-right font-light transition-colors duration-500 ${isSelected ? 'text-[#F0B118]' : 'text-white'}`}
+                                            className={`font-serif text-[28px] lg:text-[40px] leading-none text-center lg:text-right font-light transition-colors duration-500 ${isSelected ? 'text-[#F0B118]' : 'text-white'}`}
                                         >
                                             {partner.name}
                                         </span>
 
                                         {/* Drawing Stroke Animation */}
                                         <div
-                                            className="absolute bottom-0 left-2 right-2 h-[2px] bg-[#F0B118]"
+                                            className="absolute bottom-0 left-2 right-2 h-[1.5px] md:h-[2px] bg-[#F0B118]"
                                             style={{
                                                 width: isSelected ? 'calc(100% - 16px)' : '0%',
                                                 opacity: isSelected ? 1 : 0,
-                                                transformOrigin: 'left',
+                                                transformOrigin: 'center lg:left',
                                                 transition: 'width 0.7s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s'
                                             }}
                                         />
@@ -249,7 +238,7 @@ export default function PartnersSection() {
                     </div>
 
                     {/* Spacer for bottom */}
-                    <div style={{ height: 'calc(900px - 393px - 57px)', flexShrink: 0 }} />
+                    <div className="flex-shrink-0" style={{ height: isMobile ? '150px' : 'calc(900px - 393px - 57px)' }} />
                 </div>
             </div>
 
