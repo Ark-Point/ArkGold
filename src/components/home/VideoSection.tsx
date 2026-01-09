@@ -6,13 +6,13 @@ export default function VideoSection() {
                 <div
                     className="grid grid-cols-12 h-full w-full"
                     style={{
-                        paddingLeft: '50px',
-                        paddingRight: '50px',
+                        paddingLeft: '100px',
+                        paddingRight: '100px',
                         columnGap: '20px'
                     }}
                 >
-                    {/* Left Content Area (6 columns) */}
-                    <div className="col-span-12 lg:col-span-5 flex flex-col items-start" style={{ marginTop: '160px' }}>
+                    {/* Left Content Area */}
+                    <div className="col-span-12 lg:col-span-4 flex flex-col items-start" style={{ marginTop: '183px' }}>
                         <span className="font-serif text-[20px] font-normal text-white">
                             Dec 19, 2025 · Seoul
                         </span>
@@ -33,22 +33,22 @@ export default function VideoSection() {
                         </p>
                     </div>
 
-                    {/* Right Video Area (7 columns) */}
+                    {/* Right Video Area */}
                     <div
-                        className="col-span-12 lg:col-span-7 flex justify-end"
-                        style={{ marginTop: '160px' }}
+                        className="col-span-12 lg:col-span-8 flex justify-end"
+                        style={{ marginTop: '183px' }}
                     >
                         <div
                             className="bg-black/40 relative overflow-hidden"
                             style={{
-                                width: '823px',
-                                height: '463px',
+                                width: '741px',
+                                height: '417px',
                                 borderRadius: '30px'
                             }}
                         >
                             {/* Video item/placeholder would go here */}
                             <div className="absolute inset-0 flex items-center justify-center">
-                                <span className="text-[#444] font-sans">Video Placeholder (823 x 463)</span>
+                                <span className="text-[#444] font-sans">Video Placeholder (741 x 417)</span>
                             </div>
                         </div>
                     </div>
