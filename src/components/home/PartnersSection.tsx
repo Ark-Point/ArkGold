@@ -133,7 +133,7 @@ export default function PartnersSection() {
         <section className="w-full bg-black flex justify-center overflow-hidden">
             <div className="w-full max-w-[1440px] h-[900px] relative bg-black">
 
-                {/* 1. Gradient Overlay (735x900) - Very left and on top of picker (z-20) */}
+                {/* 1. Gradient Overlay (735x900) */}
                 <div
                     className="absolute z-20 pointer-events-none"
                     style={{
@@ -145,111 +145,116 @@ export default function PartnersSection() {
                     }}
                 />
 
-                {/* 2. Right Side Content - Aligned to 8th column (835px from left of 1440px) */}
+                {/* 12-column Grid Container */}
                 <div
-                    className="absolute z-10 flex flex-col items-start"
+                    className="grid grid-cols-12 w-full h-full relative z-10"
                     style={{
-                        left: '835px',
-                        top: '0',
-                        width: '505px',
-                        height: '100%'
+                        paddingLeft: '100px',
+                        paddingRight: '100px',
+                        columnGap: '20px'
                     }}
                 >
-                    {/* "Partners" Title */}
+                    {/* Picker Container - Columns 2-5 */}
                     <div
-                        className="font-serif text-[54px] font-normal text-white leading-tight"
-                        style={{ position: 'absolute', top: '100px' }}
+                        className="col-start-2 col-end-6 relative h-full z-30 pointer-events-auto"
                     >
-                        Partners
-                    </div>
+                        {/* Scrollable Area */}
+                        <div
+                            ref={scrollContainerRef}
+                            className="absolute inset-0 flex flex-col items-end overflow-hidden scrollbar-hide"
+                            style={{
+                                scrollbarWidth: 'none',
+                            }}
+                        >
+                            {/* Spacer for top - Center alignment approx */}
+                            <div style={{ height: '393px', flexShrink: 0 }} />
 
-                    {/* Partner Logo Placeholder - Bottom edge at 450px */}
-                    <div
-                        className="bg-zinc-900 flex items-center justify-center border border-zinc-800"
-                        style={{
-                            position: 'absolute',
-                            top: '386px',
-                            width: '245px',
-                            height: '64px'
-                        }}
-                    >
-                        <span className="text-zinc-600 text-[12px]">Partner Logo (245x64)</span>
-                    </div>
-
-                    {/* Partner Description - Top at 450px + 32px */}
-                    <div
-                        className="font-sans text-[20px] font-normal text-white leading-[28px] transition-all duration-300"
-                        style={{
-                            position: 'absolute',
-                            top: '482px',
-                            width: '421px',
-                            height: '112px',
-                            overflow: 'hidden'
-                        }}
-                    >
-                        {PARTNERS[selectedIdx]?.description}
-                    </div>
-                </div>
-
-                {/* 3. Scrollable Picker Container - Right edge fixed at 766px from section right */}
-                <div
-                    ref={scrollContainerRef}
-                    className="absolute z-15 flex flex-col items-end overflow-hidden scrollbar-hide"
-                    style={{
-                        right: '766px',
-                        top: '0',
-                        width: '469px',
-                        height: '100%',
-                        scrollbarWidth: 'none',
-                    }}
-                >
-                    {/* Spacer for top */}
-                    <div style={{ height: '393px', flexShrink: 0 }} />
-
-                    <div className="flex flex-col items-end w-full gap-[48px]">
-                        {PARTNERS.map((partner, index) => {
-                            const isSelected = selectedIdx === index;
-                            return (
-                                <div
-                                    key={index}
-                                    ref={el => { itemRefs.current[index] = el; }}
-                                    className="flex flex-col items-end group"
-                                    style={{
-                                        width: 'fit-content',
-                                        height: '57px',
-                                        cursor: 'pointer',
-                                        position: 'relative',
-                                    }}
-                                    onClick={() => (scrollContainerRef.current as any)?._handleClick?.(index)}
-                                >
-                                    <div
-                                        className="flex items-center justify-end px-2 py-2"
-                                        style={{ height: '57px', position: 'relative' }}
-                                    >
-                                        <span
-                                            className={`font-serif text-[40px] leading-none text-right font-light transition-colors duration-500 ${isSelected ? 'text-[#F0B118]' : 'text-white'}`}
-                                        >
-                                            {partner.name}
-                                        </span>
-
-                                        {/* Drawing Stroke Animation */}
+                            <div className="flex flex-col items-end w-full gap-[48px]">
+                                {PARTNERS.map((partner, index) => {
+                                    const isSelected = selectedIdx === index;
+                                    return (
                                         <div
-                                            className="absolute bottom-0 left-2 right-2 h-[2px] bg-[#F0B118]"
+                                            key={index}
+                                            ref={el => { itemRefs.current[index] = el; }}
+                                            className="flex flex-col items-end group"
                                             style={{
-                                                width: isSelected ? 'calc(100% - 16px)' : '0%',
-                                                opacity: isSelected ? 1 : 0,
-                                                transformOrigin: 'left',
-                                                transition: 'width 0.7s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s'
+                                                width: 'fit-content',
+                                                height: '57px',
+                                                cursor: 'pointer',
+                                                position: 'relative',
                                             }}
-                                        />
-                                    </div>
-                                </div>
-                            );
-                        })}
+                                            onClick={() => (scrollContainerRef.current as any)?._handleClick?.(index)}
+                                        >
+                                            <div
+                                                className="flex items-center justify-end px-2 py-2"
+                                                style={{ height: '57px', position: 'relative' }}
+                                            >
+                                                <span
+                                                    className={`font-serif text-[40px] leading-none text-right font-light transition-colors duration-500 ${isSelected ? 'text-[#F0B118]' : 'text-white'}`}
+                                                >
+                                                    {partner.name}
+                                                </span>
+
+                                                {/* Drawing Stroke Animation */}
+                                                <div
+                                                    className="absolute bottom-0 left-2 right-2 h-[2px] bg-[#F0B118]"
+                                                    style={{
+                                                        width: isSelected ? 'calc(100% - 16px)' : '0%',
+                                                        opacity: isSelected ? 1 : 0,
+                                                        transformOrigin: 'left',
+                                                        transition: 'width 0.7s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s'
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Spacer for bottom */}
+                            <div style={{ height: 'calc(900px - 393px - 57px)', flexShrink: 0 }} />
+                        </div>
                     </div>
 
-                    {/* Spacer for bottom */}
-                    <div style={{ height: 'calc(900px - 393px - 57px)', flexShrink: 0 }} />
+                    {/* Right Side Content - Columns 8-11 */}
+                    <div
+                        className="col-start-8 col-end-12 flex flex-col items-start relative h-full"
+                    >
+                        {/* "Partners" Title */}
+                        <div
+                            className="font-serif text-[54px] font-normal text-white leading-tight"
+                            style={{ position: 'absolute', top: '100px' }}
+                        >
+                            Partners
+                        </div>
+
+                        {/* Partner Logo Placeholder */}
+                        <div
+                            className="bg-zinc-900 flex items-center justify-center border border-zinc-800"
+                            style={{
+                                position: 'absolute',
+                                top: '386px',
+                                width: '245px',
+                                height: '64px'
+                            }}
+                        >
+                            <span className="text-zinc-600 text-[12px]">Partner Logo (245x64)</span>
+                        </div>
+
+                        {/* Partner Description */}
+                        <div
+                            className="font-sans text-[20px] font-normal text-white leading-[28px] transition-all duration-300"
+                            style={{
+                                position: 'absolute',
+                                top: '482px',
+                                width: '100%',
+                                height: '112px',
+                                overflow: 'hidden'
+                            }}
+                        >
+                            {PARTNERS[selectedIdx]?.description}
+                        </div>
+                    </div>
                 </div>
             </div>
 

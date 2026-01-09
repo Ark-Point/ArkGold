@@ -308,6 +308,8 @@ export default function ContactSection({
                         }}
                         onMouseEnter={() => setSubmitHover(true)}
                         onMouseLeave={() => setSubmitHover(false)}
+                        onPointerEnter={() => setSubmitHover(true)}
+                        onPointerLeave={() => setSubmitHover(false)}
                         onClick={handleSubmit}
                     >
                         <div className="relative">
