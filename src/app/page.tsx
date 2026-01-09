@@ -1,21 +1,21 @@
 import Header from "@/components/layout/Header";
-import Hero from "@/components/home/Hero";
-import VideoSection from "@/components/home/VideoSection";
-import BenefitsSection from "@/components/home/BenefitsSection";
-import PartnersSection from "@/components/home/PartnersSection";
-import ContactSection from "@/components/home/ContactSection";
-import Footer from "@/components/home/Footer";
+import MobileHero from "@/components/home/mobile/Hero";
+import MobileVideoSection from "@/components/home/mobile/VideoSection";
+import MobileBenefitsSection from "@/components/home/mobile/BenefitsSection";
+import MobilePartnersSection from "@/components/home/mobile/PartnersSection";
+import MobileContactSection from "@/components/home/mobile/ContactSection";
+import MobileFooter from "@/components/home/mobile/Footer";
 
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col bg-background text-foreground overflow-x-hidden">
       <Header />
-      <Hero />
-      <VideoSection />
-      <BenefitsSection />
-      <PartnersSection />
-      <ContactSection />
-      <Footer />
+      <MobileHero />
+      <MobileVideoSection />
+      <MobileBenefitsSection />
+      <MobilePartnersSection />
+      <MobileContactSection />
+      <MobileFooter />
     </main>
   );
 }
