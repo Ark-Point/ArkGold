@@ -31,7 +31,7 @@ export default function Footer({ isSubmitting, progress = 0 }: FooterProps) {
                     {/* Logo - src/images/logo.svg */}
                     <div className="flex items-center">
                         <Image
-                            src="/images/logo.svg"
+                            src="/images/web-logo.svg"
                             alt="Logo"
                             width={200}
                             height={32}
