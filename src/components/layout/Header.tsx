@@ -30,8 +30,10 @@ export default function Header() {
                 </Link>
 
                 {/* Desktop Navigation placeholder */}
-                <nav className="hidden md:block">
-                    {/* Menu items would go here */}
+                <nav className="hidden md:flex items-center gap-[40px]">
+                    <Link href="/trade" className="font-inter text-[16px] text-white hover:text-[#F0B118] transition-colors">
+                        Trade
+                    </Link>
                 </nav>
             </div>
         </header>

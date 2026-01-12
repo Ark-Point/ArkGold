@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Hero() {
     return (
@@ -55,6 +56,24 @@ export default function Hero() {
                             without leaving the metal behind.
                         </span>
                     </p>
+
+                    {/* Start Trading Gold Button */}
+                    <Link
+                        href="/trade"
+                        className="flex items-center mt-[10px] group"
+                        style={{ columnGap: '-4px' }}
+                    >
+                        <span className="font-inter font-normal text-[24px] text-[#F0B118]">
+                            Start Trading Gold
+                        </span>
+                        <Image
+                            src="/images/arrow-big.svg"
+                            alt="Arrow"
+                            width={50}
+                            height={50}
+                            className="transition-transform group-hover:translate-x-1"
+                        />
+                    </Link>
                 </div>
             </div>
         </section>
