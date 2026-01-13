@@ -6,7 +6,7 @@ import { useState } from "react";
 
 export default function Header() {
     return (
-        <header className="absolute top-0 left-0 right-0 z-50 w-full pt-[20px] md:pt-8">
+        <header className="absolute top-0 left-0 right-0 z-50 w-full pt-[20px] md:pt-[24px]">
             <div className="flex items-center justify-between px-[24px] md:px-[100px]">
                 <Link href="/" className="flex items-center">
                     {/* Mobile Logo */}
@@ -31,9 +31,6 @@ export default function Header() {
 
                 {/* Desktop Navigation placeholder */}
                 <nav className="hidden md:flex items-center gap-[40px]">
-                    <Link href="/trade" className="font-inter text-[16px] text-white hover:text-[#F0B118] transition-colors">
-                        Trade
-                    </Link>
                 </nav>
             </div>
         </header>

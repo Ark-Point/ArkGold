@@ -4,7 +4,7 @@ import Image from "next/image";
 
 export default function TradePage() {
     return (
-        <main className="relative min-h-screen w-full bg-black overflow-hidden flex flex-col items-center">
+        <main className="relative min-h-screen w-full bg-black overflow-hidden flex flex-col items-center page-fade-in">
             {/* Background Image */}
             <div className="absolute inset-0 z-0">
                 <Image
@@ -47,7 +47,7 @@ export default function TradePage() {
             <TradeHeader />
 
             {/* Main Content Centered */}
-            <div className="relative z-10 flex-1 flex items-center justify-center w-full min-h-[920px]">
+            <div className="relative z-10 flex-1 flex items-center justify-center w-full min-h-[800px]">
                 <TradeCard />
             </div>
         </main>

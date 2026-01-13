@@ -38,17 +38,17 @@ export default function VideoSection() {
                         {/* Start Trading Gold Button */}
                         <Link
                             href="/trade"
-                            className="flex items-center mt-[23px] group"
-                            style={{ columnGap: '2px' }}
+                            className="flex items-center mt-[23px] group trading-button-container video-section-fix"
+                            style={{ columnGap: '6px' }}
                         >
                             <span className="font-inter font-normal text-[20px] text-[#F0B118]">
                                 Start Trading Gold
                             </span>
                             <Image
-                                src="/images/arrow-small.svg"
+                                src="/images/arrow-section.svg"
                                 alt="Arrow"
-                                width={50}
-                                height={50}
+                                width={20}
+                                height={16}
                                 className="transition-transform group-hover:translate-x-1"
                             />
                         </Link>

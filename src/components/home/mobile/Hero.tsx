@@ -41,7 +41,7 @@ export default function Hero() {
                         Gold Now Liquid
                     </h1>
                     <p
-                        className="font-sans text-[14px] md:text-[18px] text-[#7c7c7c] font-normal mt-2 md:mt-0 md:font-medium tracking-[-0.02em] md:tracking-[-0.01em]"
+                        className="font-sans text-[14px] md:text-[18px] text-[#7c7c7c] font-normal mt-[10px] md:font-medium tracking-[-0.02em] md:tracking-[-0.01em]"
                         style={{
                             lineHeight: '16px',
                         }}
@@ -60,17 +60,17 @@ export default function Hero() {
                     {/* Start Trading Gold Button */}
                     <Link
                         href="/trade"
-                        className="flex items-center mt-[10px] group"
-                        style={{ columnGap: '-4px' }}
+                        className="flex items-center mt-[10px] group trading-button-container"
+                        style={{ columnGap: '8px' }}
                     >
                         <span className="font-inter font-normal text-[24px] text-[#F0B118]">
                             Start Trading Gold
                         </span>
                         <Image
-                            src="/images/arrow-big.svg"
+                            src="/images/arrow-hero.svg"
                             alt="Arrow"
-                            width={50}
-                            height={50}
+                            width={22}
+                            height={18}
                             className="transition-transform group-hover:translate-x-1"
                         />
                     </Link>
