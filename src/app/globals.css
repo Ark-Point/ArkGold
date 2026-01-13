@@ -118,6 +118,7 @@
     position: relative;
     display: inline-flex;
     align-items: center;
+    cursor: pointer;
 }
 
 .trading-button-container::after {

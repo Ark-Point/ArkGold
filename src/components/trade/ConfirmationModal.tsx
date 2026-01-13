@@ -32,15 +32,15 @@ export default function ConfirmationModal({
     const formatWithEllipsis = (amount: string, minDecimals: number = 2) => {
         if (!amount) return amount;
         const parts = amount.split('.');
-        if (parts[1] && parts[1].length > 6) {
+        if (parts[1] && parts[1].length > 4) {
             return parseFloat(amount).toLocaleString(undefined, {
-                minimumFractionDigits: 6,
-                maximumFractionDigits: 6
+                minimumFractionDigits: 4,
+                maximumFractionDigits: 4
             }) + '...';
         }
         return parseFloat(amount).toLocaleString(undefined, {
             minimumFractionDigits: minDecimals,
-            maximumFractionDigits: 6
+            maximumFractionDigits: 4
         });
     };
 
@@ -50,8 +50,8 @@ export default function ConfirmationModal({
     const priceImpact = "< 0.01 %";
 
     return (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in p-4">
-            <div className="w-full max-w-[420px] bg-[#141414] border border-[#2E2E2E] rounded-[24px] shadow-2xl flex flex-col overflow-hidden animate-slide-up">
+        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in p-4 md:p-0">
+            <div className="w-full max-w-[420px] bg-[#141414] border border-[#2E2E2E] rounded-[24px] shadow-2xl flex flex-col overflow-hidden animate-slide-up-in">
 
                 {/* 1. Header */}
                 <div className="flex items-center justify-between px-6 py-5">
@@ -174,7 +174,7 @@ export default function ConfirmationModal({
                     <button
                         onClick={onConfirm}
                         disabled={isProcessing}
-                        className="w-full h-[56px] bg-[#F0B118] hover:bg-[#E0A008] disabled:bg-[#1A1A1A] disabled:text-[#3B3C40] active:scale-[0.98] rounded-xl text-black font-semibold text-[16px] transition-all flex items-center justify-center gap-2"
+                        className="w-full h-[52px] md:h-[56px] bg-[#F0B118] hover:bg-[#E0A008] disabled:bg-[#1A1A1A] disabled:text-[#3B3C40] active:scale-[0.98] rounded-xl text-black font-semibold text-[16px] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
                     >
                         {isProcessing ? (
                             <>

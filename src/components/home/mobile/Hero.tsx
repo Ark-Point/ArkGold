@@ -48,8 +48,7 @@ export default function Hero() {
                     >
                         <span className="md:hidden">
                             Hold investment-grade gold with the speed <br />
-                            of crypto - without leaving the metal <br />
-                            behind.
+                            of crypto - without leaving the metal behind.
                         </span>
                         <span className="hidden md:block" style={{ lineHeight: '20px' }}>
                             Hold investment-grade gold with the speed of crypto -<br />
@@ -61,17 +60,17 @@ export default function Hero() {
                     <Link
                         href="/trade"
                         className="flex items-center mt-[10px] group trading-button-container"
-                        style={{ columnGap: '8px' }}
+                        style={{ columnGap: '6px' }}
                     >
-                        <span className="font-inter font-normal text-[24px] text-[#F0B118]">
+                        <span className="font-inter font-normal text-[16px] md:text-[24px] text-[#F0B118]">
                             Start Trading Gold
                         </span>
                         <Image
                             src="/images/arrow-hero.svg"
                             alt="Arrow"
-                            width={22}
-                            height={18}
-                            className="transition-transform group-hover:translate-x-1"
+                            width={18}
+                            height={14}
+                            className="md:w-[22px] md:h-[18px] transition-transform group-hover:translate-x-1"
                         />
                     </Link>
                 </div>

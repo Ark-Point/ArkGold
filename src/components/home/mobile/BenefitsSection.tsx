@@ -67,17 +67,17 @@ export default function BenefitsSection() {
                         <Link
                             href="/trade"
                             className="flex items-center mt-[10px] group trading-button-container"
-                            style={{ columnGap: '6px' }}
+                            style={{ columnGap: '5px' }}
                         >
-                            <span className="font-inter font-normal text-[20px] text-[#F0B118]">
+                            <span className="font-inter font-normal text-[16px] md:text-[20px] text-[#F0B118]">
                                 Start Trading Gold
                             </span>
                             <Image
                                 src="/images/arrow-section.svg"
                                 alt="Arrow"
-                                width={20}
-                                height={16}
-                                className="transition-transform group-hover:translate-x-1"
+                                width={16}
+                                height={12}
+                                className="md:w-5 md:h-4 transition-transform group-hover:translate-x-1"
                             />
                         </Link>
                     </div>

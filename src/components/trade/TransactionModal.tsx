@@ -51,53 +51,43 @@ export default function TransactionModal({
     const formatWithEllipsis = (val: string, decimals: number = 2) => {
         if (!val) return val;
         const parts = val.split('.');
-        if (parts[1] && parts[1].length > 6) {
+        if (parts[1] && parts[1].length > 4) {
             return parseFloat(val).toLocaleString(undefined, {
-                minimumFractionDigits: 6,
-                maximumFractionDigits: 6
+                minimumFractionDigits: 4,
+                maximumFractionDigits: 4
             }) + '...';
         }
         return parseFloat(val).toLocaleString(undefined, {
             minimumFractionDigits: decimals,
-            maximumFractionDigits: 6
+            maximumFractionDigits: 4
         });
     };
 
     return (
-        <div className={`fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${isClosing ? 'opacity-0' : 'opacity-100 animate-fade-in'}`}>
-            <div className={`relative w-[500px] bg-[#141414] border border-[#3B3C40] rounded-[24px] p-[40px] shadow-2xl overflow-hidden transition-all duration-300 ${isClosing ? 'scale-95 opacity-0' : 'scale-100'}`}>
+        <div className={`fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity duration-300 p-4 ${isClosing ? 'opacity-0' : 'opacity-100 animate-fade-in'}`}>
+            <div className={`relative w-full max-w-[500px] bg-[#141414] border border-[#3B3C40] rounded-[24px] p-6 md:p-[40px] shadow-2xl overflow-hidden transition-all duration-300 ${isClosing ? 'scale-95 opacity-0' : 'scale-100'}`}>
                 {/* Decoration */}
                 <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-[#F0B118]/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-[60px]" />
 
                 <div className="relative z-10 flex flex-col items-center">
                     {/* Success Icon Recommendation: Circle Checkmark */}
-                    <div className="mb-[24px]">
-                        {type === 'Buy' ? (
-                            /* Gold Circle + Black Check for Buy */
-                            <div className="w-[80px] h-[80px] bg-[#F0B118] rounded-full flex items-center justify-center">
-                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M18.6 6L9 15.6L5.4 12" stroke="black" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                            </div>
-                        ) : (
-                            /* White Circle + Black Check for Sell */
-                            <div className="w-[80px] h-[80px] bg-white rounded-full flex items-center justify-center">
-                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M18.6 6L9 15.6L5.4 12" stroke="black" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                            </div>
-                        )}
+                    <div className="mb-4 md:mb-[24px]">
+                        <div className="w-[64px] h-[64px] md:w-[80px] md:h-[80px] bg-[#F0B118] rounded-full flex items-center justify-center">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="md:w-10 md:h-10">
+                                <path d="M18.6 6L9 15.6L5.4 12" stroke="black" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                        </div>
                     </div>
 
-                    <h3 className="font-inter font-semibold text-[28px] text-white mb-[8px]">
+                    <h3 className="font-inter font-semibold text-[22px] md:text-[28px] text-white mb-[8px] text-center">
                         Transaction Successful
                     </h3>
-                    <p className="font-inter text-[16px] text-[#8C8D91] mb-[32px]">
+                    <p className="font-inter text-[14px] md:text-[16px] text-[#8C8D91] mb-6 md:mb-[32px] text-center">
                         Your order has been executed successfully.
                     </p>
 
                     {/* Receipt Details */}
-                    <div className="w-full bg-[#1A1A1A] border border-[#2E2E2E] rounded-[16px] p-[24px] mb-[32px]">
+                    <div className="w-full bg-[#1A1A1A] border border-[#2E2E2E] rounded-[16px] p-[24px] mb-6 md:mb-[32px]">
                         <div className="flex flex-col gap-[16px]">
                             <DetailRow label="Transaction ID" value={transactionId} />
                             <DetailRow label="Time" value={timestamp} />
@@ -110,7 +100,7 @@ export default function TransactionModal({
                     </div>
 
                     {/* Updated Balances */}
-                    <div className="w-full mb-[40px]">
+                    <div className="w-full mb-8 md:mb-[40px]">
                         <p className="font-inter text-[14px] text-[#5D5D5D] mb-[12px] uppercase tracking-wider">Updated Balances</p>
                         <div className="grid grid-cols-2 gap-[12px]">
                             <div className="bg-[#1A1A1A] p-[16px] rounded-[12px] border border-[#2E2E2E]">
@@ -127,7 +117,7 @@ export default function TransactionModal({
                     {/* Done Button */}
                     <button
                         onClick={handleClose}
-                        className={`w-full h-[60px] font-inter font-semibold text-[18px] rounded-[12px] transition-colors ${type === 'Sell' ? 'bg-white text-black hover:bg-[#EAEAEA]' : 'bg-[#F0B118] text-black hover:bg-[#E0A008]'}`}
+                        className="w-full h-[52px] md:h-[60px] font-inter font-semibold text-[16px] bg-[#F0B118] text-black rounded-[12px] transition-colors hover:bg-[#E0A008] cursor-pointer"
                     >
                         Done
                     </button>

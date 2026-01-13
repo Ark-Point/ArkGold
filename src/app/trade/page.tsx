@@ -16,38 +16,31 @@ export default function TradePage() {
                 />
             </div>
 
-            {/* 
-        Overlay Gradients 
-        1. Vertical: Middle Top -> Middle Bottom. Black -> Transparent -> Black.
-        0% #000000 100%
-        20% #000000 0%
-        80% #000000 0%
-        100% #000000 100%
-      */}
+            {/* Background Gradients Overlay */}
             <div
                 className="absolute inset-0 z-1 pointer-events-none"
                 style={{
                     background: `
-                linear-gradient(to bottom, 
-                    rgba(0,0,0,1) 0%, 
-                    rgba(0,0,0,0) 20%, 
-                    rgba(0,0,0,0) 80%, 
-                    rgba(0,0,0,1) 100%
-                ),
-                linear-gradient(to right, 
-                    rgba(0,0,0,1) 0%, 
-                    rgba(0,0,0,0) 20%, 
-                    rgba(0,0,0,0) 80%, 
-                    rgba(0,0,0,1) 100%
-                )
-            `
+                        linear-gradient(to bottom, 
+                            rgba(0,0,0,1) 0%, 
+                            rgba(0,0,0,0) 20%, 
+                            rgba(0,0,0,0) 80%, 
+                            rgba(0,0,0,1) 100%
+                        ),
+                        linear-gradient(to right, 
+                            rgba(0,0,0,1) 0%, 
+                            rgba(0,0,0,0) 20%, 
+                            rgba(0,0,0,0) 80%, 
+                            rgba(0,0,0,1) 100%
+                        )
+                    `
                 }}
             />
 
             <TradeHeader />
 
             {/* Main Content Centered */}
-            <div className="relative z-10 flex-1 flex items-center justify-center w-full min-h-[800px]">
+            <div className="relative z-10 flex-1 flex items-center justify-center w-full min-h-[800px] px-[18px] md:px-0">
                 <TradeCard />
             </div>
         </main>
