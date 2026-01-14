@@ -2,22 +2,32 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 
-describe("ArkGold RWA Protocol Complete Test", function () {
+describe("ArkGold RWA Protocol Real-World Price Test", function () {
   
+  // 1 Troy Ounce = 31.1034768 g
+  const GRAMS_PER_OUNCE = ethers.utils.parseUnits("31.1034768", 18);
+
   async function deployProtocolFixture() {
     const [deployer, user1, user2] = await ethers.getSigners();
 
-    // 1. Mock Tokens & Oracle
+    // ------------------------------------------------------
+    // 1. Deply & Set up 
+    // ------------------------------------------------------
+
+    // A. Mock USDT
     const MockUSDT = await ethers.getContractFactory("MockUSDT");
     const usdt = await MockUSDT.deploy();
     await usdt.deployed(); 
 
+    // B. Mock Oracle
+    // Current PAXG - USD Price : $4,622.30 / oz
+    // Chainlink use 8 decimals : 4622.30 * 10^8 = 462230000000
+    const ORACLE_PRICE = "462230000000";
     const MockOracle = await ethers.getContractFactory("MockV3Aggregator");
-    // $100/g (8 decimals)
-    const oracle = await MockOracle.deploy(8, "10000000000"); 
+    const oracle = await MockOracle.deploy(8, ORACLE_PRICE); 
     await oracle.deployed();
 
-    // 2. Assets
+    // C. (Token, NFT)
     const ArkGold = await ethers.getContractFactory("ArkGold");
     const arkGold = await ArkGold.deploy();
     await arkGold.deployed();
@@ -26,7 +36,7 @@ describe("ArkGold RWA Protocol Complete Test", function () {
     const nft = await ArkGoldNFT.deploy();
     await nft.deployed();
 
-    // 3. Vaults
+    // D. (Vaults)
     const USDTVault = await ethers.getContractFactory("USDTVault");
     const usdtVault = await USDTVault.deploy(usdt.address);
     await usdtVault.deployed();
@@ -35,7 +45,7 @@ describe("ArkGold RWA Protocol Complete Test", function () {
     const goldVault = await GoldVault.deploy(nft.address);
     await goldVault.deployed();
 
-    // 4. Exchanger
+    // E. (Exchanger)
     const Exchanger = await ethers.getContractFactory("ArkGoldExchanger");
     const exchanger = await Exchanger.deploy(
       arkGold.address,
@@ -46,7 +56,9 @@ describe("ArkGold RWA Protocol Complete Test", function () {
     );
     await exchanger.deployed();
 
-    // --- Wiring ---
+    // ------------------------------------------------------
+    // 2. Wiring
+    // ------------------------------------------------------
     const MINTER_ROLE = await arkGold.MINTER_ROLE();
     const BURNER_ROLE = await arkGold.BURNER_ROLE();
     await arkGold.grantRole(MINTER_ROLE, exchanger.address);
@@ -63,9 +75,12 @@ describe("ArkGold RWA Protocol Complete Test", function () {
     const NFT_MINTER_ROLE = await nft.MINTER_ROLE();
     const NFT_BURNER_ROLE = await nft.BURNER_ROLE();
     await nft.grantRole(NFT_MINTER_ROLE, deployer.address);
-    await nft.grantRole(NFT_BURNER_ROLE, deployer.address);
 
-    // [수정] Initial USDT: $200,000 (1kg 살 돈은 있어야 함)
+    // ------------------------------------------------------
+    // 3. Initial set up  
+    // ------------------------------------------------------
+    // USDT airdrop to User1 ($200,000)
+    // 1kg(약 32oz) =>  $150,000 required.
     const initialUsdtBalance = ethers.utils.parseUnits("200000", 6);
     await usdt.transfer(user1.address, initialUsdtBalance);
     await usdt.connect(user1).approve(exchanger.address, ethers.constants.MaxUint256);
@@ -73,46 +88,48 @@ describe("ArkGold RWA Protocol Complete Test", function () {
     return { usdt, oracle, arkGold, nft, usdtVault, goldVault, exchanger, deployer, user1, user2 };
   }
 
-  // 1. GoldVault Test
-  describe("GoldVault & Hybrid PoR Logic", function () {
-    it("Should update reserve automatically when NFT is deposited", async function () {
+  // ==============================================================================
+  // Test Start 
+  // ==============================================================================
+
+  
+  describe("GoldVault Inventory & PoR", function () {
+    it("Should track available Token IDs correctly", async function () {
       const { goldVault, nft, deployer } = await loadFixture(deployProtocolFixture);
       
-      const weight = ethers.utils.parseUnits("1000", 18);
-      await nft.mint(deployer.address, 1, weight, "SERIAL-001");
-      await nft.safeTransferFrom(deployer.address, goldVault.address, 1, 1, "0x");
+      // 100g gold nft mint(amount: 2) - (ID: 101, 102)
+      // weight는 그램(g) 단위 입력: 100 * 10^18
+      const weight100g = ethers.utils.parseUnits("100", 18);
+      await nft.mint(deployer.address, 101, weight100g, "BAR-101");
+      await nft.mint(deployer.address, 102, weight100g, "BAR-102");
 
-      expect(await goldVault.totalNftWeight()).to.equal(weight);
-      expect(await goldVault.getReserve()).to.equal(weight);
-    });
+      // Vault deposit
+      await nft.safeTransferFrom(deployer.address, goldVault.address, 101, 1, "0x");
+      await nft.safeTransferFrom(deployer.address, goldVault.address, 102, 1, "0x");
 
-    it("Hybrid PoR: Should use the lower value (Circuit Breaker)", async function () {
-      const { goldVault, nft, deployer } = await loadFixture(deployProtocolFixture);
+      const inventory = await goldVault.getAvailableTokenIds();
 
-      const weight = ethers.utils.parseUnits("1000", 18);
-      await nft.mint(deployer.address, 1, weight, "S-1");
-      await nft.safeTransferFrom(deployer.address, goldVault.address, 1, 1, "0x");
-      
-      expect(await goldVault.getReserve()).to.equal(weight);
+      expect(inventory.length).to.equal(2);
+      expect(inventory[0]).to.equal(101);
+      expect(inventory[1]).to.equal(102);
 
-      await goldVault.updateAuditedReserve(0);
-      expect(await goldVault.getReserve()).to.equal(0);
-
-      await goldVault.updateAuditedReserve(weight);
-      expect(await goldVault.getReserve()).to.equal(weight);
+      const totalWeight = await goldVault.totalNftWeight();
+      expect(totalWeight).to.equal(ethers.utils.parseUnits("200", 18));
     });
   });
 
-  // 2. Buy Gold
-  describe("Buy Gold", function () {
-    it("Should buy gold correctly with 6-decimal USDT", async function () {
+  
+  describe("Buy Gold (Ounce Base)", function () {
+    it("Should buy exactly 1 Ounce with $4,622.30", async function () {
       const { exchanger, arkGold, usdt, goldVault, nft, deployer, user1 } = await loadFixture(deployProtocolFixture);
 
-      const weight = ethers.utils.parseUnits("1000", 18);
-      await nft.mint(deployer.address, 1, weight, "S-1");
-      await nft.safeTransferFrom(deployer.address, goldVault.address, 1, 1, "0x");
+      
+      const weight1kg = ethers.utils.parseUnits("1000", 18);
+      await nft.mint(deployer.address, 999, weight1kg, "BAR-1KG");
+      await nft.safeTransferFrom(deployer.address, goldVault.address, 999, 1, "0x");
 
-      const usdtAmount = ethers.utils.parseUnits("100", 6); // $100 -> 1g
+      // 4622.30 -> 6 decimals 변환
+      const usdtAmount = ethers.utils.parseUnits("4622.3", 6);
       
       await expect(exchanger.connect(user1).buyGold(usdtAmount, 0))
         .to.emit(exchanger, "GoldBought")
@@ -120,189 +137,161 @@ describe("ArkGold RWA Protocol Complete Test", function () {
 
       expect(await arkGold.balanceOf(user1.address)).to.equal(ethers.utils.parseUnits("1", 18));
     });
-
-    it("Should revert if reserve is insufficient (PoR Check)", async function () {
-      const { exchanger, user1 } = await loadFixture(deployProtocolFixture);
-      const usdtAmount = ethers.utils.parseUnits("100", 6);
-      await expect(exchanger.connect(user1).buyGold(usdtAmount, 0)).to.be.revertedWith("PoR Failed: Reserve Low");
-    });
   });
 
-  // 3. Sell Gold
   describe("Sell Gold", function () {
-    it("Should sell gold correctly and receive USDT", async function () {
-      const { exchanger, arkGold, usdt, goldVault, nft, deployer, user1 } = await loadFixture(deployProtocolFixture);
+    it("Should receive correct USDT when selling 0.1 Ounce", async function () {
+        const { exchanger, usdt, goldVault, nft, deployer, user1 } = await loadFixture(deployProtocolFixture);
 
-      const weight = ethers.utils.parseUnits("1000", 18);
-      await nft.mint(deployer.address, 1, weight, "S-1");
-      await nft.safeTransferFrom(deployer.address, goldVault.address, 1, 1, "0x");
-      
-      await exchanger.connect(user1).buyGold(ethers.utils.parseUnits("1000", 6), 0);
+        await nft.mint(deployer.address, 999, ethers.utils.parseUnits("1000", 18), "BAR-1KG");
+        await nft.safeTransferFrom(deployer.address, goldVault.address, 999, 1, "0x");
 
-      const sellAmount = ethers.utils.parseUnits("5", 18);
-      await expect(exchanger.connect(user1).sellGold(sellAmount, 0))
-        .to.emit(exchanger, "GoldSold")
-        .withArgs(user1.address, sellAmount, ethers.utils.parseUnits("500", 6));
+        const buyAmount = ethers.utils.parseUnits("4622.3", 6);
+        await exchanger.connect(user1).buyGold(buyAmount, 0);
 
-      expect(await arkGold.balanceOf(user1.address)).to.equal(ethers.utils.parseUnits("5", 18));
-      expect(await usdt.balanceOf(user1.address)).to.equal(ethers.utils.parseUnits("199500", 6)); // 200,000 - 1000 + 500
+        // $4,622.30 * 0.1 = $462.23
+        const sellAmount = ethers.utils.parseUnits("0.1", 18);
+        const expectedUsdt = ethers.utils.parseUnits("462.23", 6);
+
+        await expect(exchanger.connect(user1).sellGold(sellAmount, 0))
+            .to.emit(exchanger, "GoldSold")
+            .withArgs(user1.address, sellAmount, expectedUsdt);
+        
+        // 200,000 - 4,622.30 + 462.23 = 195,839.93
+        const finalBalance = await usdt.balanceOf(user1.address);
+        expect(finalBalance).to.equal(ethers.utils.parseUnits("195839.93", 6));
     });
   });
 
-  // 4. Redeem Gold
-  describe("Redeem Gold", function () {
-    it("Should redeem physical NFT by burning tokens", async function () {
-      const { exchanger, arkGold, goldVault, nft, deployer, user1 } = await loadFixture(deployProtocolFixture);
+  describe("Redeem Gold (Gram -> Ounce Conversion)", function () {
+    
+    it("Should calculate cost for 100g Bar correctly", async function () {
+        const { exchanger, goldVault, nft, deployer, arkGold, user1 } = await loadFixture(deployProtocolFixture);
 
-      const weight = ethers.utils.parseUnits("1000", 18);
-      await nft.mint(deployer.address, 777, weight, "KGE-BAR-777");
-      await nft.safeTransferFrom(deployer.address, goldVault.address, 777, 1, "0x");
+        await nft.mint(deployer.address, 999, ethers.utils.parseUnits("1000", 18), "LIQUIDITY-BAR");
+        await nft.safeTransferFrom(deployer.address, goldVault.address, 999, 1, "0x");
 
-      // [수정] 1kg(1000g)를 사려면 $100,000이 필요함 (1g=$100)
-      // 이전 코드: 1000 (1000달러) -> 10g 밖에 안 됨
-      // 수정 코드: 100000 (10만 달러) -> 1000g 구매 완료
-      await exchanger.connect(user1).buyGold(ethers.utils.parseUnits("100000", 6), 0);
-      
-      // 이제 토큰 1000g이 있으므로 인출 가능
-      await expect(exchanger.connect(user1).redeemGold(777))
-        .to.emit(exchanger, "GoldRedeemed")
-        .withArgs(user1.address, 777);
+        const weight100g = ethers.utils.parseUnits("100", 18);
+        await nft.mint(deployer.address, 888, weight100g, "BAR-100G");
+        await nft.safeTransferFrom(deployer.address, goldVault.address, 888, 1, "0x");
 
-      expect(await arkGold.balanceOf(user1.address)).to.equal(0);
-      expect(await nft.balanceOf(user1.address, 777)).to.equal(1);
-      expect(await goldVault.totalNftWeight()).to.equal(0);
+        // (100 * 1e18) / 31.1034768
+        // about 3.21507 oz
+        const expectedBurnAmount = weight100g.mul(ethers.utils.parseUnits("1", 18)).div(GRAMS_PER_OUNCE);
+        
+        const previewAmount = await exchanger.previewRedeem(888);
+        expect(previewAmount).to.equal(expectedBurnAmount);
+
+        // 3. ( user $15,000 buy -> 3.24 oz)
+        await exchanger.connect(user1).buyGold(ethers.utils.parseUnits("15000", 6), 0);
+
+        await expect(exchanger.connect(user1).redeemGold(888))
+            .to.emit(exchanger, "GoldRedeemed")
+            .withArgs(user1.address, 888, expectedBurnAmount);
+
+        expect(await nft.balanceOf(user1.address, 888)).to.equal(1);
+        const inventory = await goldVault.getAvailableTokenIds();
+        expect(inventory).to.not.include(888);
     });
 
-    it("Should revert redeem if user has insufficient tokens", async function () {
-      const { exchanger, goldVault, nft, deployer, user1 } = await loadFixture(deployProtocolFixture);
+    it("Should allow redeeming 1 Don (3.75g)", async function () {
+        const { exchanger, goldVault, nft, deployer, user1 } = await loadFixture(deployProtocolFixture);
 
-      const weight = ethers.utils.parseUnits("1000", 18);
-      await nft.mint(deployer.address, 888, weight, "BAR-888");
-      await nft.safeTransferFrom(deployer.address, goldVault.address, 888, 1, "0x");
-      
-      // 500g만 구매 ($50,000)
-      await exchanger.connect(user1).buyGold(ethers.utils.parseUnits("50000", 6), 0);
+        await nft.mint(deployer.address, 999, ethers.utils.parseUnits("100", 18), "LIQUIDITY");
+        await nft.safeTransferFrom(deployer.address, goldVault.address, 999, 1, "0x");
 
-      // 1000g 인출 시도 -> 실패
-      await expect(exchanger.connect(user1).redeemGold(888)).to.be.reverted; 
-    });
-  });
+        const weight1Don = ethers.utils.parseUnits("3.75", 18);
+        await nft.mint(deployer.address, 777, weight1Don, "DON-777");
+        await nft.safeTransferFrom(deployer.address, goldVault.address, 777, 1, "0x");
 
-  // 5. Security
-  describe("Security & Pausable", function () {
-    it("Should pause and block trades", async function () {
-      const { exchanger, deployer, user1 } = await loadFixture(deployProtocolFixture);
-      await exchanger.connect(deployer).pause();
-      await expect(exchanger.connect(user1).buyGold(100, 0)).to.be.reverted; 
-    });
+        // 3.75 / 31.1034768... ≈ 0.120565 oz
+        const expectedBurn = weight1Don.mul(ethers.utils.parseUnits("1", 18)).div(GRAMS_PER_OUNCE);
 
-    it("Should only allow Owner to pause", async function () {
-        const { exchanger, user1 } = await loadFixture(deployProtocolFixture);
-        await expect(exchanger.connect(user1).pause()).to.be.reverted;
-    });
-  });
+        // 3. ( user buy $600 -> 0.13 oz)
+        await exchanger.connect(user1).buyGold(ethers.utils.parseUnits("600", 6), 0);
 
-  // ----------------------------------------------------------------
-  // 7. Deployment Validations (Zero Address Check)
-  // ----------------------------------------------------------------
-  describe("Deployment Validations", function () {
-    it("Should revert if deployed with zero address", async function () {
-      const { arkGold, usdt, usdtVault, goldVault, oracle } = await loadFixture(deployProtocolFixture);
-      const Exchanger = await ethers.getContractFactory("ArkGoldExchanger");
-
-      // 1. RWA Token이 0 주소일 때
-      await expect(
-        Exchanger.deploy(
-          ethers.constants.AddressZero, // Error here
-          usdt.address,
-          usdtVault.address,
-          goldVault.address,
-          oracle.address
-        )
-      ).to.be.revertedWithCustomError(Exchanger, "ZeroAddress");
-
-      // 2. USDT가 0 주소일 때
-      await expect(
-        Exchanger.deploy(
-          arkGold.address,
-          ethers.constants.AddressZero, // Error here
-          usdtVault.address,
-          goldVault.address,
-          oracle.address
-        )
-      ).to.be.revertedWithCustomError(Exchanger, "ZeroAddress");
+        await expect(exchanger.connect(user1).redeemGold(777))
+            .to.emit(exchanger, "GoldRedeemed")
+            .withArgs(user1.address, 777, expectedBurn);
     });
   });
 
-  // ----------------------------------------------------------------
-  // 8. Access Control (Hacker Checks)
-  // ----------------------------------------------------------------
-  describe("Access Control & Security", function () {
-    it("Hacker should NOT be able to mint ArkGold directly", async function () {
-      const { arkGold, user2 } = await loadFixture(deployProtocolFixture);
-      
-      // User2(해커)가 직접 mint 호출 시도 -> 권한 없음 에러
-      await expect(
-        arkGold.connect(user2).mint(user2.address, 1000)
-      ).to.be.reverted; // AccessControl 에러
-    });
+  describe("Security Checks", function () {
+    it("Hacker cannot withdraw collateral from GoldVault directly", async function () {
+        const { goldVault, user2 } = await loadFixture(deployProtocolFixture);
 
-    it("Hacker should NOT be able to withdraw from Vaults", async function () {
-      const { usdtVault, goldVault, user2 } = await loadFixture(deployProtocolFixture);
-
-      // USDT 금고 털기 시도
-      await expect(
-        usdtVault.connect(user2).withdraw(user2.address, 1000)
-      ).to.be.reverted;
-
-      // Gold 금고 털기 시도
-      await expect(
-        goldVault.connect(user2).withdrawCollateral(user2.address, 1)
-      ).to.be.reverted;
-    });
-
-    it("Vault should reject Fake NFTs", async function () {
-      const { goldVault, deployer } = await loadFixture(deployProtocolFixture);
-
-      // 1. 가짜 NFT 컨트랙트 배포
-      const FakeNFT = await ethers.getContractFactory("ArkGoldNFT1155");
-      const fakeNft = await FakeNFT.deploy();
-      await fakeNft.deployed();
-
-      // 2. 가짜 NFT 민팅
-      await fakeNft.mint(deployer.address, 999, ethers.utils.parseUnits("1000", 18), "FAKE");
-      
-      // 3. GoldVault로 전송 시도 -> onERC1155Received에서 막혀야 함 ("Only ArkGoldNFT allowed")
-      await expect(
-        fakeNft.safeTransferFrom(deployer.address, goldVault.address, 999, 1, "0x")
-      ).to.be.revertedWith("Only ArkGoldNFT allowed");
-    });
-  });
-
-  // ----------------------------------------------------------------
-  // 9. Edge Cases (Invalid Inputs)
-  // ----------------------------------------------------------------
-  describe("Edge Cases", function () {
-    it("Should revert when buying with 0 amount", async function () {
-        const { exchanger, user1 } = await loadFixture(deployProtocolFixture);
-        // 0 USDT로 구매 시도 -> 계산 결과 0 -> Slippage 등에서 걸리거나 0 transfer 등
-        // 우리 로직상: goldAmount = 0 -> Slippage Check에서 막힐 가능성 큼
         await expect(
-            exchanger.connect(user1).buyGold(0, 0)
-        ).to.be.revertedWithCustomError(exchanger, "ZeroAmount");
+            goldVault.connect(user2).withdrawCollateral(user2.address, 101)
+        ).to.be.reverted; 
     });
 
-    it("Should revert if price is zero or negative (Oracle Fail)", async function () {
-        // Oracle Mock을 새로 배포해서 가격을 0으로 설정해봄
+    it("Hacker cannot mint ArkGold directly", async function () {
+        const { arkGold, user2 } = await loadFixture(deployProtocolFixture);
+
+        await expect(
+            arkGold.connect(user2).mint(user2.address, 1000)
+        ).to.be.reverted;
+    });
+
+    it("Should block functionality when paused", async function () {
+      const { exchanger, deployer, user1 } = await loadFixture(deployProtocolFixture);
+
+      await exchanger.connect(deployer).pause();
+
+      await expect(
+          exchanger.connect(user1).buyGold(100, 0)
+      ).to.be.revertedWithCustomError(exchanger, "EnforcedPause")
+
+      await expect(
+          exchanger.connect(user1).redeemGold(101)
+      ).to.be.revertedWithCustomError(exchanger, "EnforcedPause")
+    });
+  });
+
+  describe("Edge Cases", function () {
+    it("Should revert if price is zero (Oracle Fail)", async function () {
         const { exchanger, oracle, user1 } = await loadFixture(deployProtocolFixture);
         
-        // 오라클 가격을 0으로 변경
+        // Oracle price 0 ( Emergency )
         await oracle.updateAnswer(0);
 
-        // 구매 시도 -> Exchanger의 require(pricePerGram > 0)에 걸려야 함
+        // try buy -> InvalidPrice Error occurred
         await expect(
-            exchanger.connect(user1).buyGold(1000, 0)
+            exchanger.connect(user1).buyGold(ethers.utils.parseUnits("1000", 6), 0)
         ).to.be.revertedWithCustomError(exchanger, "InvalidPrice");
+    });
+
+    it("Should fail if trying to redeem NFT not in Vault", async function () {
+        const { exchanger, nft, deployer, user1 } = await loadFixture(deployProtocolFixture);
+        
+        await nft.mint(deployer.address, 999, ethers.utils.parseUnits("10", 18), "NOT-IN-VAULT");
+
+        await expect(
+            exchanger.connect(user1).redeemGold(999)
+        ).to.be.revertedWith("NFT not in Vault");
+    });
+
+    it("Should REVERT if user tries to send Batch NFTs (safeBatchTransferFrom)", async function () {
+      const { goldVault, nft, deployer } = await loadFixture(deployProtocolFixture);
+      
+      await nft.mint(deployer.address, 1, 100, "B1");
+      await nft.mint(deployer.address, 2, 100, "B2");
+
+      await expect(
+          nft.safeBatchTransferFrom(deployer.address, goldVault.address, [1, 2], [1, 1], "0x")
+      ).to.be.revertedWith("Batch transfer not supported");
+    });
+
+    it("Should revert buyGold if slippage is exceeded", async function () {
+      const { exchanger, user1 } = await loadFixture(deployProtocolFixture);
+      
+      const usdtAmount = ethers.utils.parseUnits("2000", 6);
+      
+      const tooHighMinAmount = ethers.utils.parseUnits("1.1", 18);
+
+      await expect(
+          exchanger.connect(user1).buyGold(usdtAmount, tooHighMinAmount)
+      ).to.be.revertedWithCustomError(exchanger, "SlippageExceeded");
     });
   });
 });

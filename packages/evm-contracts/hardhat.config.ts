@@ -42,9 +42,9 @@ const config: HardhatUserConfig = {
     hardhat: {
       accounts: { count: 1000 },
     },
-    polygon: {
-      chainId: 137,
-      url: `https://polygon-mainnet.g.alchemy.com/v2/k4LSpPS3k-KRKboeoE4WR`,
+    mantleSepolia: {
+      chainId: 5003,
+      url: `https://mantle-sepolia.g.alchemy.com/v2/odI2NaaLwdvIou5YgputY`,
       accounts: [process.env.OPERATOR_KEY || ""],
     },
   },
@@ -52,12 +52,11 @@ const config: HardhatUserConfig = {
     apiKey: process.env.ETHERSCAN_API_KEY || "",
     customChains: [
       {
-        network: "polygon",
-        chainId: 137,
+        network: "mantleSepolia",
+        chainId: 5003,
         urls: {
-          // V2로 바뀌어도 이 API 주소는 유효합니다.
-          apiURL: "https://api.polygonscan.com/api",
-          browserURL: "https://polygonscan.com",
+          apiURL: "https://explorer.sepolia.mantle.xyz/api",
+          browserURL: "https://explorer.sepolia.mantle.xyz",
         },
       },
     ],

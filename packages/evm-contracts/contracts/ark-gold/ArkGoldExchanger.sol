@@ -10,7 +10,7 @@ import "../oracle/interfaces/AggregatorV3Interface.sol";
 import "../vault/USDTVault.sol";
 import "../vault/GoldVault.sol";
 import "../ark-gold/interfaces/IArkGoldNFT1155.sol";
-import "../stable-coin/MockUSDT.sol";
+import "../stable-coin/MockUSDT.sol"; 
 
 contract ArkGoldExchanger is Ownable, ReentrancyGuard, Pausable {
     IMintableBurnable public rwaToken; 
@@ -19,9 +19,12 @@ contract ArkGoldExchanger is Ownable, ReentrancyGuard, Pausable {
     GoldVault public goldVault;
     AggregatorV3Interface public priceFeed;
 
+    // 1 Troy Ounce = 31.1034768 Grams (18 decimals Precision)
+    uint256 public constant GRAMS_PER_OUNCE = 31103476800000000000; 
+
     event GoldBought(address indexed user, uint256 usdtAmount, uint256 goldAmount);
     event GoldSold(address indexed user, uint256 goldAmount, uint256 usdtAmount);
-    event GoldRedeemed(address indexed user, uint256 tokenId);
+    event GoldRedeemed(address indexed user, uint256 tokenId, uint256 burnAmount);
 
     error ZeroAddress();
     error ZeroAmount();
@@ -35,40 +38,51 @@ contract ArkGoldExchanger is Ownable, ReentrancyGuard, Pausable {
         address _goldVault, 
         address _priceFeed
     ) Ownable(msg.sender) {
+        
         if(_rwa == address(0)) revert ZeroAddress();
         if(_usdt == address(0)) revert ZeroAddress();
         if(_usdtVault == address(0)) revert ZeroAddress();
         if(_goldVault == address(0)) revert ZeroAddress();
         if(_priceFeed == address(0)) revert ZeroAddress();
 
-        rwaToken = IMintableBurnable(_rwa); // 형변환
+        rwaToken = IMintableBurnable(_rwa);
         usdtToken = IERC20(_usdt);
         usdtVault = USDTVault(_usdtVault);
         goldVault = GoldVault(_goldVault);
         priceFeed = AggregatorV3Interface(_priceFeed);
     }
 
-    // 가격 조회 (18 decimals 변환)
+    
+    // Chainlink: XAU/USD (Per Ounce)
     function getGoldPrice() public view returns (uint256) {
         (, int256 price, , , ) = priceFeed.latestRoundData();
+        
+        if(price <= 0) revert InvalidPrice();
+
         uint8 decimals = priceFeed.decimals();
+        
         return uint256(price) * (10 ** (18 - decimals));
     }
 
-    // [BUY] USDT -> Gold Token
+    // [BUY] USDT -> Gold Token (Ounce Base)
     function buyGold(uint256 usdtAmount, uint256 minGoldOut) external nonReentrant whenNotPaused {
         if (usdtAmount == 0) revert ZeroAmount();
 
-        uint256 pricePerGram = getGoldPrice();
-        if(pricePerGram == 0) revert InvalidPrice();
+        uint256 pricePerOunce = getGoldPrice(); 
 
+        // USDT convert to 18 decimals value (MockUSDT=6, 18-6=12)
         uint256 usdtAmount18 = usdtAmount * 1e12; 
         
-        uint256 goldAmount = (usdtAmount18 * 1e18) / pricePerGram;
+        uint256 goldAmount = (usdtAmount18 * 1e18) / pricePerOunce;
+        
         
         if(goldAmount < minGoldOut) revert SlippageExceeded();
 
-        require(rwaToken.totalSupply() + goldAmount <= goldVault.getReserve(), "PoR Failed: Reserve Low");
+        // PoR : (Current Supply + mint amount) <= (total oz, converted by total reserve(g))
+        // Reserve(Oz) = (Reserve(g) * 1e18) / GRAMS_PER_OUNCE
+        uint256 reserveInOunces = (goldVault.getReserve() * 1e18) / GRAMS_PER_OUNCE;
+        
+        require(rwaToken.totalSupply() + goldAmount <= reserveInOunces, "PoR Failed: Reserve Low");
 
         require(usdtToken.transferFrom(msg.sender, address(this), usdtAmount), "USDT Transfer Failed");
         usdtToken.approve(address(usdtVault), usdtAmount);
@@ -83,36 +97,42 @@ contract ArkGoldExchanger is Ownable, ReentrancyGuard, Pausable {
     function sellGold(uint256 goldAmount, uint256 minUsdtOut) external nonReentrant whenNotPaused {
         if (goldAmount == 0) revert ZeroAmount();
 
-        uint256 pricePerGram = getGoldPrice();
-        uint256 usdtValue18 = (goldAmount * pricePerGram) / 1e18;
+        uint256 pricePerOunce = getGoldPrice();
+        
+        uint256 usdtValue18 = (goldAmount * pricePerOunce) / 1e18;
         
         uint256 usdtAmount = usdtValue18 / 1e12;
 
         if(usdtAmount < minUsdtOut) revert SlippageExceeded();
 
-        // 토큰 소각 (인터페이스 호출)
         rwaToken.burn(msg.sender, goldAmount);
-        
-        // 자금 인출
         usdtVault.withdraw(msg.sender, usdtAmount);
+        
         emit GoldSold(msg.sender, goldAmount, usdtAmount);
-
     }
 
-    // [REDEEM] Gold Token -> Physical NFT
-    function redeemGold(uint256 tokenId) external nonReentrant whenNotPaused {
-        // 1. NFT 무게 조회 (Vault 통해 확인)
+    function previewRedeem(uint256 tokenId) public view returns (uint256) {
+        // ERC1155 balanceOf(owner, id)
         IArkGoldNFT1155 nft = goldVault.nftContract();
-        uint256 weight = nft.getWeight(tokenId);
-        require(weight > 0, "Invalid Token ID");
 
-        // 2. 무게만큼 토큰 소각 (잔고 부족 시 자동 Revert)
-        rwaToken.burn(msg.sender, weight);
+        require(nft.balanceOf(address(goldVault), tokenId) > 0, "NFT not in Vault");
 
-        // 3. NFT 실물 인출 (Exchanger가 Vault 권한 필요)
+        uint256 weightInGrams = nft.getWeight(tokenId);
+        require(weightInGrams > 0, "Invalid Token ID");
+
+        // (g * 1e18) / 31.1035...
+        return (weightInGrams * 1e18) / GRAMS_PER_OUNCE;
+    }
+
+    // [REDEEM] Physical NFT 
+    function redeemGold(uint256 tokenId) external nonReentrant whenNotPaused {
+        uint256 burnAmountInOunces = previewRedeem(tokenId);
+        
+        rwaToken.burn(msg.sender, burnAmountInOunces);
+
         goldVault.withdrawCollateral(msg.sender, tokenId);
 
-        emit GoldRedeemed(msg.sender, tokenId);
+        emit GoldRedeemed(msg.sender, tokenId, burnAmountInOunces);
     }
 
     function pause() external onlyOwner {
