@@ -155,7 +155,7 @@ export default function ConfirmationModal({
                             </div>
                             <div className="flex justify-between items-center text-[13px]">
                                 <span className="text-[#8C8D91]">Rate</span>
-                                <span className="text-white font-medium">1 AGLD = {goldPrice.toFixed(2)} USDT</span>
+                                <span className="text-white font-medium">1 AGLD (oz t) = {goldPrice.toFixed(2)} USDT</span>
                             </div>
                             <div className="flex justify-between items-center text-[13px]">
                                 <span className="text-[#8C8D91]">Max Slippage</span>

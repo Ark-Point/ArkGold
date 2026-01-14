@@ -92,10 +92,10 @@ export default function TransactionModal({
                             <DetailRow label="Transaction ID" value={transactionId} />
                             <DetailRow label="Time" value={timestamp} />
                             <DetailRow label="Type" value={`${type} Gold`} valueColor={type === 'Buy' ? '#34C86E' : '#FF4D4D'} />
-                            <DetailRow label="Quantity" value={`${formatWithEllipsis(amount, type === 'Buy' ? 6 : 2)}g`} />
-                            <DetailRow label="Price" value={`$${parseFloat(price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}/g`} />
+                            <DetailRow label="Quantity" value={`${formatWithEllipsis(amount, type === 'Buy' ? 6 : 2)} AGLD`} />
+                            <DetailRow label="Price" value={`$${parseFloat(price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}/oz t`} />
                             <div className="h-[1px] bg-[#2E2E2E] my-[4px]" />
-                            <DetailRow label="Total Amount" value={`$${formatWithEllipsis(total, type === 'Buy' ? 2 : 6)} USD`} isTotal />
+                            <DetailRow label="Total Amount" value={`$${formatWithEllipsis(total, type === 'Buy' ? 2 : 6)} USDT`} isTotal />
                         </div>
                     </div>
 
@@ -104,12 +104,12 @@ export default function TransactionModal({
                         <p className="font-inter text-[14px] text-[#5D5D5D] mb-[12px] uppercase tracking-wider">Updated Balances</p>
                         <div className="grid grid-cols-2 gap-[12px]">
                             <div className="bg-[#1A1A1A] p-[16px] rounded-[12px] border border-[#2E2E2E]">
-                                <p className="text-[#8C8D91] text-[12px] mb-[4px]">USD Balance</p>
+                                <p className="text-[#8C8D91] text-[12px] mb-[4px]">USDT Balance</p>
                                 <p className="text-white font-medium text-[16px]">${newBalance.usd}</p>
                             </div>
                             <div className="bg-[#1A1A1A] p-[16px] rounded-[12px] border border-[#2E2E2E]">
                                 <p className="text-[#8C8D91] text-[12px] mb-[4px]">AGLD Balance</p>
-                                <p className="text-[#F0B118] font-medium text-[16px]">{newBalance.gold}g</p>
+                                <p className="text-[#F0B118] font-medium text-[16px]">{newBalance.gold} AGLD</p>
                             </div>
                         </div>
                     </div>

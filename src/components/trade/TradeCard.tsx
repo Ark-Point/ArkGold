@@ -18,7 +18,7 @@ export default function TradeCard() {
     const [showSuccess, setShowSuccess] = useState(false);
     const [lastTransaction, setLastTransaction] = useState<{ amount: string; total: string; type: 'Buy' | 'Sell' } | null>(null);
 
-    const goldPrice = 90.50; // 1g = $90.50 USDT
+    const goldPrice = 2814.86; // 1 oz t = $2,814.86 USDT
 
     const handlePayChange = (value: string) => {
         setPayAmount(value);
@@ -130,7 +130,7 @@ export default function TradeCard() {
                 {/* Action Button */}
                 <div className="mt-[42px] w-full flex flex-col items-center">
                     <div className="w-full flex items-center gap-2 mb-3 px-1">
-                        <span className="text-[15px] text-[#BCBCBC] font-inter font-medium leading-none">1 AGLD = 90.50 USDT</span>
+                        <span className="text-[15px] text-[#BCBCBC] font-inter font-medium leading-none">1 AGLD (oz t) = 2,814.86 USDT</span>
                         <div className="flex items-center gap-1.5 ml-1">
                             <div className="w-1.5 h-1.5 bg-[#34C86E] rounded-full animate-pulse" />
                             <span className="font-inter text-[11px] text-[#34C86E] font-medium tracking-wider uppercase leading-none">Live</span>
