@@ -182,26 +182,26 @@ main().catch((error) => {
 
 /** Deployed Information
  * 
- * Deploying contracts with account: 0xEeFE0C690aF97991a48118521D16B7f9aB472752
-✔ Deploying ArkGold Contract Set
+ Deploying contracts with account: 0xEeFE0C690aF97991a48118521D16B7f9aB472752
+ ✔ Deploying ArkGold Contract Set
       🔱 with the account: 0xEeFE0C690aF97991a48118521D16B7f9aB472752
       Running on network: mantleSepolia
       Do you continue? … yes
  Deploying Mocks...
- - MockUSDT Deployed: 0x2a0DC6c51641A55fa464d6D369e0C72337bC5099
- - MockOracle Deployed: 0xeaeAd465b128692c84c1A3B3913CCc6d8ee0efB7
+ - MockUSDT Deployed: 0x8AcE21fFcaD3C88BeD80F9eD87A6639A1830EE33
+ - MockOracle Deployed: 0x11F7ebB2A6D5c38489a21a4DfA678D8590f81c7c
  Deploying Assets... 
- - ArkGold (Token): 0x3076e90edF9E67D030E66a15Ec3F133f865a9611
- - ArkGoldNFT (1155): 0x29CFCF5B9653afB2Bbda52923a773d9967377291
+ - ArkGold (Token): 0x5Cdc260886b73b54F18088726e1AB9072A21a5e0
+ - ArkGoldNFT (1155): 0x94e5294E7a514cC1B088233eFe7AFF8BA59dB8Dd
 
-3️⃣  Deploying Vaults...
- - USDTVault: 0x4a34c46273fa4351C5c25895c34662BAD96eFa30
- - GoldVault: 0xC72e70CDF0442FfBc037E33EeaDB84Cb7db5a0AE
+ Deploying Vaults...
+ - USDTVault: 0x2f43968fa8DfeAC62BC49EA240DfAa0C448547B8
+ - GoldVault: 0xdA8B9dB5d176dFcc355027273436a53A8Fad388e
 
-4️⃣  Deploying Exchanger...
- - ArkGoldExchanger: 0x211EfA007348bC841857386Fa4D98368AA4B30Ec
+ Deploying Exchanger...
+ - ArkGoldExchanger: 0x716e73639aA52C529f9DB16d383f27803f1fa7A5
 
-5️⃣  Setting up Permissions (Wiring)...
+ Setting up Permissions (Wiring)...
  ✅ ArkGold: Minter/Burner role granted to Exchanger
  ✅ USDTVault: Exchanger role granted to Exchanger
  ✅ GoldVault: Admin role granted to Exchanger
@@ -213,66 +213,42 @@ main().catch((error) => {
 
 ⏳ Waiting for block confirmations before verification...
 🔍 Starting Verification...
-Successfully submitted source code for contract
-contracts/stable-coin/MockUSDT.sol:MockUSDT at 0x2a0DC6c51641A55fa464d6D369e0C72337bC5099
-for verification on the block explorer. Waiting for verification result...
+The contract 0x8AcE21fFcaD3C88BeD80F9eD87A6639A1830EE33 has already been verified on the block explorer. If you're trying to verify a partially verified contract, please use the --force flag.
+https://explorer.sepolia.mantle.xyz/address/0x8AcE21fFcaD3C88BeD80F9eD87A6639A1830EE33#code
 
-Successfully verified contract MockUSDT on the block explorer.
-https://explorer.sepolia.mantle.xyz/address/0x2a0DC6c51641A55fa464d6D369e0C72337bC5099#code
-
-Successfully submitted source code for contract
-contracts/oracle/MockV3Aggregator.sol:MockV3Aggregator at 0xeaeAd465b128692c84c1A3B3913CCc6d8ee0efB7
-for verification on the block explorer. Waiting for verification result...
-
-Successfully verified contract MockV3Aggregator on the block explorer.
-https://explorer.sepolia.mantle.xyz/address/0xeaeAd465b128692c84c1A3B3913CCc6d8ee0efB7#code
+The contract 0x11F7ebB2A6D5c38489a21a4DfA678D8590f81c7c has already been verified on the block explorer. If you're trying to verify a partially verified contract, please use the --force flag.
+https://explorer.sepolia.mantle.xyz/address/0x11F7ebB2A6D5c38489a21a4DfA678D8590f81c7c#code
 
 Successfully submitted source code for contract
-contracts/ark-gold/ArkGold.sol:ArkGold at 0x3076e90edF9E67D030E66a15Ec3F133f865a9611
+contracts/ark-gold/ArkGold.sol:ArkGold at 0x5Cdc260886b73b54F18088726e1AB9072A21a5e0
 for verification on the block explorer. Waiting for verification result...
 
 Successfully verified contract ArkGold on the block explorer.
-https://explorer.sepolia.mantle.xyz/address/0x3076e90edF9E67D030E66a15Ec3F133f865a9611#code
+https://explorer.sepolia.mantle.xyz/address/0x5Cdc260886b73b54F18088726e1AB9072A21a5e0#code
 
-Successfully submitted source code for contract
-contracts/ark-gold/ArkGoldNFT1155.sol:ArkGoldNFT1155 at 0x29CFCF5B9653afB2Bbda52923a773d9967377291
-for verification on the block explorer. Waiting for verification result...
+The contract 0x94e5294E7a514cC1B088233eFe7AFF8BA59dB8Dd has already been verified on the block explorer. If you're trying to verify a partially verified contract, please use the --force flag.
+https://explorer.sepolia.mantle.xyz/address/0x94e5294E7a514cC1B088233eFe7AFF8BA59dB8Dd#code
 
-Successfully verified contract ArkGoldNFT1155 on the block explorer.
-https://explorer.sepolia.mantle.xyz/address/0x29CFCF5B9653afB2Bbda52923a773d9967377291#code
+The contract 0x2f43968fa8DfeAC62BC49EA240DfAa0C448547B8 has already been verified on the block explorer. If you're trying to verify a partially verified contract, please use the --force flag.
+https://explorer.sepolia.mantle.xyz/address/0x2f43968fa8DfeAC62BC49EA240DfAa0C448547B8#code
 
-Successfully submitted source code for contract
-contracts/vault/USDTVault.sol:USDTVault at 0x4a34c46273fa4351C5c25895c34662BAD96eFa30
-for verification on the block explorer. Waiting for verification result...
+The contract 0xdA8B9dB5d176dFcc355027273436a53A8Fad388e has already been verified on the block explorer. If you're trying to verify a partially verified contract, please use the --force flag.
+https://explorer.sepolia.mantle.xyz/address/0xdA8B9dB5d176dFcc355027273436a53A8Fad388e#code
 
-Successfully verified contract USDTVault on the block explorer.
-https://explorer.sepolia.mantle.xyz/address/0x4a34c46273fa4351C5c25895c34662BAD96eFa30#code
-
-Successfully submitted source code for contract
-contracts/vault/GoldVault.sol:GoldVault at 0xC72e70CDF0442FfBc037E33EeaDB84Cb7db5a0AE
-for verification on the block explorer. Waiting for verification result...
-
-Successfully verified contract GoldVault on the block explorer.
-https://explorer.sepolia.mantle.xyz/address/0xC72e70CDF0442FfBc037E33EeaDB84Cb7db5a0AE#code
-
-Successfully submitted source code for contract
-contracts/ark-gold/ArkGoldExchanger.sol:ArkGoldExchanger at 0x211EfA007348bC841857386Fa4D98368AA4B30Ec
-for verification on the block explorer. Waiting for verification result...
-
-Successfully verified contract ArkGoldExchanger on the block explorer.
-https://explorer.sepolia.mantle.xyz/address/0x211EfA007348bC841857386Fa4D98368AA4B30Ec#code
+The contract 0x716e73639aA52C529f9DB16d383f27803f1fa7A5 has already been verified on the block explorer. If you're trying to verify a partially verified contract, please use the --force flag.
+https://explorer.sepolia.mantle.xyz/address/0x716e73639aA52C529f9DB16d383f27803f1fa7A5#code
 
 
 🎉 Deployment & Verification Finished!
 ┌────────────┬──────────────────────────────────────────────┐
-│  (index)   │                    Values                    │
+│ (index)    │ Values                                       │
 ├────────────┼──────────────────────────────────────────────┤
-│  MockUSDT  │ '0x2a0DC6c51641A55fa464d6D369e0C72337bC5099' │
-│ MockOracle │ '0xeaeAd465b128692c84c1A3B3913CCc6d8ee0efB7' │
-│  ArkGold   │ '0x3076e90edF9E67D030E66a15Ec3F133f865a9611' │
-│ ArkGoldNFT │ '0x29CFCF5B9653afB2Bbda52923a773d9967377291' │
-│ USDTVault  │ '0x4a34c46273fa4351C5c25895c34662BAD96eFa30' │
-│ GoldVault  │ '0xC72e70CDF0442FfBc037E33EeaDB84Cb7db5a0AE' │
-│ Exchanger  │ '0x211EfA007348bC841857386Fa4D98368AA4B30Ec' │
+│ MockUSDT   │ '0x8AcE21fFcaD3C88BeD80F9eD87A6639A1830EE33' │
+│ MockOracle │ '0x11F7ebB2A6D5c38489a21a4DfA678D8590f81c7c' │
+│ ArkGold    │ '0x5Cdc260886b73b54F18088726e1AB9072A21a5e0' │
+│ ArkGoldNFT │ '0x94e5294E7a514cC1B088233eFe7AFF8BA59dB8Dd' │
+│ USDTVault  │ '0x2f43968fa8DfeAC62BC49EA240DfAa0C448547B8' │
+│ GoldVault  │ '0xdA8B9dB5d176dFcc355027273436a53A8Fad388e' │
+│ Exchanger  │ '0x716e73639aA52C529f9DB16d383f27803f1fa7A5' │
 └────────────┴──────────────────────────────────────────────┘
  */

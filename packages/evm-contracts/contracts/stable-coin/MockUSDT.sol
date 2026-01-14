@@ -8,6 +8,13 @@ contract MockUSDT is ERC20 {
     constructor() ERC20("Mock USDT", "USDT") {
         _mint(msg.sender, 1000000 * 10**6);
     }
+    
+    // decimal override 
+    function decimals() public view virtual override returns (uint8) {
+        return 6;
+    }
+
+
     function faucet() external {
         _mint(msg.sender, 1000 * 10**6);
     }
