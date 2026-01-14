@@ -28,16 +28,16 @@ export default function Footer() {
 
                         {/* Links & Docs (Row 1) */}
                         <div className="w-full h-[32px] flex justify-between items-center text-[#cacace]">
-                            <Link href="#" className="font-normal text-[14px] text-[#cacace] visited:text-[#cacace] hover:text-[#cacace]/80 transition-colors">
+                            <Link href="#" className="font-normal text-[14px] text-[#cacace] visited:text-[#cacace] cursor-default" onClick={(e) => e.preventDefault()}>
                                 Privacy Policy.
                             </Link>
                             <span className="font-normal text-[14px]">|</span>
-                            <Link href="#" className="font-normal text-[14px] text-[#cacace] visited:text-[#cacace] hover:text-[#cacace]/80 transition-colors">
+                            <Link href="#" className="font-normal text-[14px] text-[#cacace] visited:text-[#cacace] cursor-default" onClick={(e) => e.preventDefault()}>
                                 Cookie Policy.
                             </Link>
                             <span className="font-normal text-[14px]">|</span>
-                            <Link href="#" className="flex items-center gap-[4px] text-[#cacace] visited:text-[#cacace] transition-opacity hover:opacity-80">
-                                <div className="w-[32px] h-[32px] relative">
+                            <Link href="https://ark-gold.gitbook.io/ark-gold-docs" target="_blank" rel="noopener noreferrer" className="flex items-center gap-[4px] text-[#cacace] visited:text-[#cacace] transition-colors hover:text-[#ffffff] group">
+                                <div className="w-[32px] h-[32px] relative transition-opacity group-hover:opacity-100">
                                     <Image
                                         src="/images/mobile-section6-docs.svg"
                                         alt="Docs"
@@ -74,16 +74,16 @@ export default function Footer() {
                         />
 
                         <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-4 gap-y-2 lg:gap-5">
-                            <Link href="#" className="text-[12px] md:text-[14px] font-normal text-[#cacace] visited:text-[#cacace] hover:opacity-80 transition-opacity">
+                            <Link href="#" className="text-[12px] md:text-[14px] font-normal text-[#cacace] visited:text-[#cacace] cursor-default" onClick={(e) => e.preventDefault()}>
                                 Privacy Policy
                             </Link>
                             <span className="hidden md:inline text-[14px] font-normal text-[#cacace]">|</span>
-                            <Link href="#" className="text-[12px] md:text-[14px] font-normal text-[#cacace] visited:text-[#cacace] hover:opacity-80 transition-opacity">
+                            <Link href="#" className="text-[12px] md:text-[14px] font-normal text-[#cacace] visited:text-[#cacace] cursor-default" onClick={(e) => e.preventDefault()}>
                                 Cookie Policy.
                             </Link>
                             <span className="hidden md:inline text-[14px] font-normal text-[#cacace]">|</span>
-                            <Link href="#" className="flex items-center h-[32px] gap-1 text-[#cacace] visited:text-[#cacace] hover:opacity-80 transition-opacity">
-                                <div className="w-6 md:w-[32px] h-6 md:h-[32px] relative">
+                            <Link href="https://ark-gold.gitbook.io/ark-gold-docs" target="_blank" rel="noopener noreferrer" className="flex items-center h-[32px] gap-1 text-[#cacace] visited:text-[#cacace] hover:text-[#ffffff] transition-colors group">
+                                <div className="w-6 md:w-[32px] h-6 md:h-[32px] relative transition-opacity group-hover:opacity-100">
                                     <Image
                                         src="/images/section6-docs.svg"
                                         alt="Docs"
