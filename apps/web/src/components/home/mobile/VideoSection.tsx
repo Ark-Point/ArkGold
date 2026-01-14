@@ -1,9 +1,12 @@
+import Image from "next/image";
+import Link from "next/link";
+
 export default function VideoSection() {
     return (
         <section className="w-full bg-[#1a1a1a] flex justify-center overflow-hidden h-[670px] md:h-auto md:min-h-[783px]">
             <div className="w-full max-w-[1440px] relative flex flex-col md:block">
                 {/* Mobile View (393px) */}
-                <div className="flex md:hidden flex-col w-full pt-[120px] px-[32px]">
+                <div className="flex md:hidden flex-col w-full pt-[100px] px-[32px]">
                     {/* Text Group - Auto Layout 20px gap */}
                     <div className="flex flex-col gap-[20px] items-start text-left">
                         <span className="font-serif text-[16px] font-normal text-[#fafafa]">
@@ -22,10 +25,27 @@ export default function VideoSection() {
                         >
                             Hold investment-grade gold with the speed of crypto - without leaving the metal behind.
                         </p>
+
+                        <Link
+                            href="/trade"
+                            className="flex items-center group trading-button-container"
+                            style={{ columnGap: '5px' }}
+                        >
+                            <span className="font-inter font-normal text-[14px] text-[#F0B118]">
+                                Start Trading Gold
+                            </span>
+                            <Image
+                                src="/images/arrow-section.svg"
+                                alt="Arrow"
+                                width={16}
+                                height={12}
+                                className="transition-transform group-hover:translate-x-1"
+                            />
+                        </Link>
                     </div>
 
-                    {/* Video Frame - mt 80px, 361x204, radius 14px */}
-                    <div className="mt-[80px] flex justify-center">
+                    {/* Video Frame - mt 60px, 361x204, radius 14px */}
+                    <div className="mt-[60px] flex justify-center">
                         <div
                             className="bg-black/40 relative overflow-hidden w-[361px] h-[204px] rounded-[14px]"
                         >

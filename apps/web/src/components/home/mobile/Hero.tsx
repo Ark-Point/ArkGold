@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Hero() {
     return (
@@ -40,21 +41,38 @@ export default function Hero() {
                         Gold Now Liquid
                     </h1>
                     <p
-                        className="font-sans text-[14px] md:text-[18px] text-[#7c7c7c] font-normal mt-2 md:mt-0 md:font-medium tracking-[-0.02em] md:tracking-[-0.01em]"
+                        className="font-sans text-[14px] md:text-[18px] text-[#7c7c7c] font-normal mt-[10px] md:font-medium tracking-[-0.02em] md:tracking-[-0.01em]"
                         style={{
                             lineHeight: '16px',
                         }}
                     >
                         <span className="md:hidden">
                             Hold investment-grade gold with the speed <br />
-                            of crypto - without leaving the metal <br />
-                            behind.
+                            of crypto - without leaving the metal behind.
                         </span>
                         <span className="hidden md:block" style={{ lineHeight: '20px' }}>
                             Hold investment-grade gold with the speed of crypto -<br />
                             without leaving the metal behind.
                         </span>
                     </p>
+
+                    {/* Start Trading Gold Button */}
+                    <Link
+                        href="/trade"
+                        className="flex items-center mt-[10px] group trading-button-container"
+                        style={{ columnGap: '6px' }}
+                    >
+                        <span className="font-inter font-normal text-[16px] md:text-[24px] text-[#F0B118]">
+                            Start Trading Gold
+                        </span>
+                        <Image
+                            src="/images/arrow-hero.svg"
+                            alt="Arrow"
+                            width={18}
+                            height={14}
+                            className="md:w-[22px] md:h-[18px] transition-transform group-hover:translate-x-1"
+                        />
+                    </Link>
                 </div>
             </div>
         </section>

@@ -1,10 +1,7 @@
-"use client";
-
-import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import Link from "next/link";
 
-export default function Header() {
+export default function TradeHeader() {
     return (
         <header className="absolute top-0 left-0 right-0 z-50 w-full pt-[20px] md:pt-[24px]">
             <div className="flex items-center justify-between px-[24px] md:px-[100px]">
@@ -28,10 +25,6 @@ export default function Header() {
                         className="hidden md:block h-[32px] w-auto object-contain"
                     />
                 </Link>
-
-                {/* Desktop Navigation placeholder */}
-                <nav className="hidden md:flex items-center gap-[40px]">
-                </nav>
             </div>
         </header>
     );

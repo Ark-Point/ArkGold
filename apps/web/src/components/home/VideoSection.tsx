@@ -1,3 +1,6 @@
+import Image from "next/image";
+import Link from "next/link";
+
 export default function VideoSection() {
     return (
         <section className="w-full bg-[#1a1a1a] flex justify-center overflow-hidden">
@@ -31,6 +34,24 @@ export default function VideoSection() {
                             Hold investment-grade gold with the speed of <br />
                             crypto - without leaving the metal behind.
                         </p>
+
+                        {/* Start Trading Gold Button */}
+                        <Link
+                            href="/trade"
+                            className="flex items-center mt-[23px] group trading-button-container video-section-fix"
+                            style={{ columnGap: '5px' }}
+                        >
+                            <span className="font-inter font-normal text-[16px] md:text-[20px] text-[#F0B118]">
+                                Start Trading Gold
+                            </span>
+                            <Image
+                                src="/images/arrow-section.svg"
+                                alt="Arrow"
+                                width={16}
+                                height={12}
+                                className="md:w-5 md:h-4 transition-transform group-hover:translate-x-1"
+                            />
+                        </Link>
                     </div>
 
                     {/* Right Video Area */}

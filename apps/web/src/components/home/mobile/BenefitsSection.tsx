@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 
 export default function BenefitsSection() {
@@ -56,12 +57,29 @@ export default function BenefitsSection() {
                 {/* Content Container */}
                 <div className="relative z-10 w-full flex flex-col pt-[113px] md:pt-0 md:px-[100px]">
                     {/* Heading Text */}
-                    <div className="w-full md:w-auto md:ml-[420px] md:pt-[64px] px-0">
+                    <div className="w-full md:w-auto md:ml-[525px] md:pt-[64px] px-0 flex flex-col items-center md:items-start">
                         <h2 className="font-serif text-[28px] md:text-[40px] font-normal text-white leading-[40px] md:leading-tight text-center md:text-left">
                             How does <span className="text-[#F0B118]">AGLD</span> <br className="md:hidden" />
-                            differentiate itself with <br className="md:hidden" />
-                            exclusive benefits?
+                            differentiate itself <br className="hidden md:block" /> with exclusive benefits?
                         </h2>
+
+                        {/* Start Trading Gold Button */}
+                        <Link
+                            href="/trade"
+                            className="flex items-center mt-[10px] group trading-button-container"
+                            style={{ columnGap: '5px' }}
+                        >
+                            <span className="font-inter font-normal text-[16px] md:text-[20px] text-[#F0B118]">
+                                Start Trading Gold
+                            </span>
+                            <Image
+                                src="/images/arrow-section.svg"
+                                alt="Arrow"
+                                width={16}
+                                height={12}
+                                className="md:w-5 md:h-4 transition-transform group-hover:translate-x-1"
+                            />
+                        </Link>
                     </div>
 
                     {/* Mobile Carousel - Horizontal Scroll */}

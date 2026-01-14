@@ -44,20 +44,20 @@ export default function Footer({ isSubmitting, progress = 0 }: FooterProps) {
                         className="flex items-center"
                         style={{ marginTop: '26px', gap: '20px' }}
                     >
-                        <Link href="#" className="font-sans text-[14px] font-normal text-[#f2f2f2]" style={{ fontFamily: 'var(--font-pretendard)' }}>
+                        <Link href="#" className="font-sans text-[14px] font-normal text-[#f2f2f2] cursor-default" style={{ fontFamily: 'var(--font-pretendard)' }} onClick={(e) => e.preventDefault()}>
                             Privacy Policy
                         </Link>
                         <span className="font-sans text-[14px] font-normal text-[#f2f2f2]" style={{ fontFamily: 'var(--font-pretendard)' }}>
                             |
                         </span>
-                        <Link href="#" className="font-sans text-[14px] font-normal text-[#f2f2f2]" style={{ fontFamily: 'var(--font-pretendard)' }}>
+                        <Link href="#" className="font-sans text-[14px] font-normal text-[#f2f2f2] cursor-default" style={{ fontFamily: 'var(--font-pretendard)' }} onClick={(e) => e.preventDefault()}>
                             Cookie Policy.
                         </Link>
                         <span className="font-sans text-[14px] font-normal text-[#f2f2f2]" style={{ fontFamily: 'var(--font-pretendard)' }}>
                             |
                         </span>
                         {/* Docs Item - height 32 */}
-                        <Link href="#" className="flex items-center h-[32px] gap-0">
+                        <Link href="https://ark-gold.gitbook.io/ark-gold-docs" target="_blank" rel="noopener noreferrer" className="flex items-center h-[32px] gap-0 group">
                             <div className="w-[32px] h-[32px] relative">
                                 <Image
                                     src="/images/section6-docs.svg"
@@ -66,7 +66,7 @@ export default function Footer({ isSubmitting, progress = 0 }: FooterProps) {
                                     className="object-contain"
                                 />
                             </div>
-                            <span className="font-sans text-[14px] font-normal text-[#f2f2f2]" style={{ fontFamily: 'var(--font-pretendard)' }}>
+                            <span className="font-sans text-[14px] font-normal text-[#f2f2f2] group-hover:text-[#ffffff] transition-colors" style={{ fontFamily: 'var(--font-pretendard)' }}>
                                 Docs
                             </span>
                         </Link>
