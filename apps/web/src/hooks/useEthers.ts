@@ -20,6 +20,8 @@ export function clientToSigner(client: Client<Transport, Chain, Account>) {
   );
 
   const signer = provider.getSigner(account.address);
+
+  console.log("signer: ", signer);
   return signer;
 }
 

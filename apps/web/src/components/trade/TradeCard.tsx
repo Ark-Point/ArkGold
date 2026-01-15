@@ -1,7 +1,9 @@
 "use client";
 
+import { useGoldPrice } from "@/hooks/useGoldPrice";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { useState } from "react";
+import { BigNumber, utils } from "ethers";
+import { useMemo, useState } from "react";
 import { useAccount } from "wagmi";
 import ConfirmationModal from "./ConfirmationModal";
 import TradeForm from "./TradeForm";
@@ -37,8 +39,23 @@ export default function TradeCard({
 
   console.log("isConnected:", isConnected);
   console.log("address:", address);
+  const {
+    data: goldPriceData,
+    isPending: goldPricePending,
+    isFetching: goldPriceFetching,
+  } = useGoldPrice();
 
-  const goldPrice = 2814.86; // 1 oz t = $2,814.86 USDT
+  const usdtDecimals = 6;
+  const agldDecimals = 18;
+  const oracleDecimals = 18;
+
+  // 1 oz t = $2,814.86 USDT
+  const goldPrice = useMemo(
+    () => goldPriceData ?? { raw: BigNumber.from(0), amount: "0" },
+    [goldPriceData]
+  );
+
+  console.log("goldPrice:", goldPrice);
 
   const handleConnectWallet = () => {
     if (!isConnected) {
@@ -57,12 +74,29 @@ export default function TradeCard({
     }
 
     const numValue = parseFloat(value);
+
     if (activeTab === "Buy") {
       // Pay USDT -> Receive AGLD
-      setReceiveAmount((numValue / goldPrice).toFixed(8));
+      const usdtIn = utils.parseUnits(value || "0", usdtDecimals); // BigNumber
+
+      // 2️⃣ AGLD 수량 계산
+      // goldOutWei = usdt * 1e18 / price
+      const agldOut = usdtIn
+        .mul(BigNumber.from(10).pow(agldDecimals))
+        .mul(BigNumber.from(10).pow(oracleDecimals))
+        .div(goldPrice?.amount)
+        .div(BigNumber.from(10).pow(usdtDecimals));
+
+      // 3️⃣ UI 표시
+      setReceiveAmount(utils.formatUnits(agldOut, agldDecimals));
     } else {
       // Pay AGLD -> Receive USDT
-      setReceiveAmount((numValue * goldPrice).toFixed(8));
+      const agldIn = utils.parseUnits(value || "0", agldDecimals);
+      const usdtOut = agldIn
+        .mul(goldPrice?.amount)
+        .div(BigNumber.from(10).pow(oracleDecimals))
+        .div(BigNumber.from(10).pow(agldDecimals));
+      setReceiveAmount(utils.formatUnits(usdtOut, usdtDecimals));
     }
   };
 
@@ -74,9 +108,22 @@ export default function TradeCard({
     // Use a variant of handlePayChange that doesn't reset the percent
     setPayAmount(amount);
     if (activeTab === "Buy") {
-      setReceiveAmount((parseFloat(amount) / goldPrice).toFixed(8));
+      const usdtIn = utils.parseUnits(amount || "0", usdtDecimals); // BigNumber
+      const agldOut = usdtIn
+        .mul(BigNumber.from(10).pow(agldDecimals))
+        .mul(BigNumber.from(10).pow(oracleDecimals))
+        .div(goldPrice?.amount)
+        .div(BigNumber.from(10).pow(usdtDecimals));
+      setReceiveAmount(utils.formatUnits(agldOut, agldDecimals));
+      //   setReceiveAmount((parseFloat(amount) / goldPrice).toFixed(8));
     } else {
-      setReceiveAmount((parseFloat(amount) * goldPrice).toFixed(8));
+      const agldIn = utils.parseUnits(amount || "0", agldDecimals);
+      const usdtOut = agldIn
+        .mul(goldPrice?.amount)
+        .div(BigNumber.from(10).pow(oracleDecimals))
+        .div(BigNumber.from(10).pow(agldDecimals));
+      setReceiveAmount(utils.formatUnits(usdtOut, usdtDecimals));
+      //   setReceiveAmount((parseFloat(amount) * goldPrice).toFixed(8));
     }
   };
 
@@ -164,7 +211,7 @@ export default function TradeCard({
           onPercentClick={handlePercentClick}
           usdBalance={usdBalance}
           goldBalance={goldBalance}
-          goldPrice={goldPrice}
+          goldPrice={Number(goldPrice?.amount)}
           isConnected={isConnected}
         />
 
@@ -172,7 +219,13 @@ export default function TradeCard({
         <div className="mt-[42px] w-full flex flex-col items-center">
           <div className="w-full flex items-center gap-2 mb-3 px-1">
             <span className="text-[15px] text-[#BCBCBC] font-inter font-medium leading-none">
-              1 AGLD (oz t) = 2,814.86 USDT
+              {`1 AGLD (oz t) = ${Number(goldPrice.amount).toLocaleString(
+                undefined,
+                {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }
+              )} USDT`}
             </span>
             <div className="flex items-center gap-1.5 ml-1">
               <div className="w-1.5 h-1.5 bg-[#34C86E] rounded-full animate-pulse" />
@@ -218,7 +271,7 @@ export default function TradeCard({
         onClose={() => setShowSuccess(false)}
         type={lastTransaction?.type || activeTab}
         amount={lastTransaction?.amount || ""}
-        price={goldPrice.toFixed(2)}
+        price={goldPrice.amount}
         total={lastTransaction?.total || ""}
         newBalance={{
           usd: usdBalance.toLocaleString(undefined, {
@@ -239,7 +292,7 @@ export default function TradeCard({
         activeTab={activeTab}
         payAmount={payAmount}
         receiveAmount={receiveAmount}
-        goldPrice={goldPrice}
+        goldPrice={Number(goldPrice?.amount)}
       />
     </div>
   );

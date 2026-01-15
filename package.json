@@ -43,6 +43,8 @@
   "packageManager": "npm@10.2.3",
   "dependencies": {
     "@google-cloud/kms": "^5.2.1",
+    "@nestjs/common": "^11.1.12",
+    "@nestjs/config": "^4.0.2",
     "@polymarket/builder-relayer-client": "^0.0.7",
     "@polymarket/clob-client": "^5.0.0",
     "axios": "^1.7.0",

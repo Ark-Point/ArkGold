@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "cross-env APP_ENV=local next dev",
+    "build": "cross-env APP_ENV=local next build",
+    "start": "cross-env APP_ENV=production next start",
     "lint": "eslint"
   },
   "dependencies": {
@@ -19,9 +19,10 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/node": "^20.19.29",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^16.6.1",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
     "eslint-plugin-security": "^3.0.1",

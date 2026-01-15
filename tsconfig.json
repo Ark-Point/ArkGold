@@ -6,9 +6,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "paths": {
-      "@ark-gold/config": ["packages/config/index.ts"],
-      "@ark-gold/redis": ["packages/redis/src/index.ts"],
-      "@ark-gold/database": ["packages/database/src/index.ts"]
+      "@ark-gold/config": ["packages/config/index.ts"]
     }
   }
 }

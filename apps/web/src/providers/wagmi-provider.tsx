@@ -1,6 +1,5 @@
 "use client";
 
-import config from "@/config";
 import {
   Chain,
   darkTheme,
@@ -14,7 +13,7 @@ import { ReactNode } from "react";
 import { http, WagmiProvider } from "wagmi";
 
 export const ethereum: Chain = {
-  id: Number(config.NEXT_PUBLIC_ETH_CHAIN_ID!),
+  id: Number(process.env.NEXT_PUBLIC_ETH_CHAIN_ID!),
   name: "ethereum",
   nativeCurrency: {
     name: "Ethereum",
@@ -23,10 +22,10 @@ export const ethereum: Chain = {
   },
   rpcUrls: {
     default: {
-      http: [config.NEXT_PUBLIC_ETH_RPC_URL ?? ""],
+      http: [process.env.NEXT_PUBLIC_ETH_RPC_URL ?? ""],
     },
     public: {
-      http: [config.NEXT_PUBLIC_ETH_RPC_URL ?? ""],
+      http: [process.env.NEXT_PUBLIC_ETH_RPC_URL ?? ""],
     },
   },
   blockExplorers: {
@@ -38,7 +37,7 @@ export const ethereum: Chain = {
 };
 
 export const mantle: Chain = {
-  id: Number(config.NEXT_PUBLIC_MANTLE_CHAIN_ID),
+  id: Number(process.env.NEXT_PUBLIC_MANTLE_CHAIN_ID),
   name: "mantle",
   nativeCurrency: {
     name: "Mantle",
@@ -47,10 +46,10 @@ export const mantle: Chain = {
   },
   rpcUrls: {
     default: {
-      http: [config.NEXT_PUBLIC_MANTLE_RPC_URL ?? ""],
+      http: [process.env.NEXT_PUBLIC_MANTLE_RPC_URL ?? ""],
     },
     public: {
-      http: [config.NEXT_PUBLIC_MANTLE_RPC_URL ?? ""],
+      http: [process.env.NEXT_PUBLIC_MANTLE_RPC_URL ?? ""],
     },
   },
   blockExplorers: {
@@ -62,7 +61,7 @@ export const mantle: Chain = {
 };
 
 // MARK: Initialize Wagmi
-const projectId = config.NEXT_PUBLIC_REOWN_PROJECT_ID || "project-id";
+const projectId = process.env.NEXT_PUBLIC_REOWN_PROJECT_ID || "project-id";
 
 const queryClient = new QueryClient();
 
@@ -71,8 +70,8 @@ const wagmiConfig = getDefaultConfig({
   projectId,
   chains: [mantle],
   transports: {
-    [mantle.id]: http(config.NEXT_PUBLIC_MANTLE_RPC_URL),
-    // [ethereum.id]: http(config.ethereum.rpcUrl),
+    [mantle.id]: http(process.env.NEXT_PUBLIC_MANTLE_RPC_URL),
+    // [ethereum.id]: http(process.env.NEXT_PUBLIC_ETH_RPC_URL),
   },
   wallets: [
     {
