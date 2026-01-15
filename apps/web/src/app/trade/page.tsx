@@ -1,8 +1,13 @@
+"use client";
+
 import TradeHeader from "@/components/trade/TradeHeader";
 import TradeCard from "@/components/trade/TradeCard";
 import Image from "next/image";
+import { useState } from "react";
 
 export default function TradePage() {
+    const [isConnected, setIsConnected] = useState(false);
+
     return (
         <main className="relative min-h-screen w-full bg-black overflow-hidden flex flex-col items-center page-fade-in">
             {/* Background Image */}
@@ -37,11 +42,11 @@ export default function TradePage() {
                 }}
             />
 
-            <TradeHeader />
+            <TradeHeader isConnected={isConnected} onConnect={() => setIsConnected(!isConnected)} />
 
             {/* Main Content Centered */}
             <div className="relative z-10 flex-1 flex items-center justify-center w-full min-h-[800px] px-[18px] md:px-0">
-                <TradeCard />
+                <TradeCard isConnected={isConnected} setIsConnected={setIsConnected} />
             </div>
         </main>
     );

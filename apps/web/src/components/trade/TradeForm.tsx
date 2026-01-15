@@ -11,6 +11,7 @@ interface TradeFormProps {
     usdBalance: number;
     goldBalance: number;
     goldPrice: number;
+    isConnected: boolean;
 }
 
 export default function TradeForm({
@@ -22,7 +23,8 @@ export default function TradeForm({
     onPercentClick,
     usdBalance,
     goldBalance,
-    goldPrice
+    goldPrice,
+    isConnected
 }: TradeFormProps) {
     const [isPayFocused, setIsPayFocused] = useState(false);
     const isBuy = activeTab === 'Buy';
@@ -43,21 +45,21 @@ export default function TradeForm({
     return (
         <div className="w-full relative flex flex-col gap-1">
             {/* Top Field (Pay) */}
-            <div className={`w-full bg-[#131418] border rounded-2xl p-4 transition-all focus-within:border-[#F0B118]/50 ${activePercent !== null ? 'border-[#F0B118]/50' : 'border-[#2E2E2E] hover:border-[#3B3C40]'}`}>
-                <div className="flex justify-between mb-2">
+            <div className={`w-full bg-[#131418] border rounded-2xl p-4 transition-all border-[#2E2E2E] hover:border-[#F0B118]/50 focus-within:border-[#F0B118]/50 group ${activePercent !== null ? 'border-[#F0B118]/50' : ''}`}>
+                <div className="flex justify-between items-center mb-2 h-[22px]">
                     <span className="text-[13px] text-[#8C8D91] font-inter">You Pay</span>
-                    <div className="flex items-center gap-2">
-                        {[0.25, 0.5, 1].map((p) => {
+                    <div className="flex items-center gap-[6px]">
+                        {[0.25, 0.5, 0.75, 1].map((p, index) => {
                             const isMax = p === 1;
                             const isActive = activePercent === p;
                             return (
                                 <button
                                     key={p}
                                     onClick={() => onPercentClick(p)}
-                                    className={`text-[14px] min-w-[46px] h-[22px] px-1 rounded transition-all font-bold leading-none ${isActive
+                                    className={`text-[11px] min-w-[38px] h-[20px] rounded-full transition-all font-semibold percent-button-stagger percent-button-delay-${index} ${!isConnected ? 'hidden' : 'flex'} ${isActive
                                         ? 'bg-[#F0B118] text-black border-[#F0B118]'
                                         : 'bg-[#1A1A1A] text-[#5D5D5D] hover:text-white border-transparent'
-                                        } border flex items-center justify-center cursor-pointer`}
+                                        } border items-center justify-center cursor-pointer`}
                                 >
                                     {isMax ? 'MAX' : `${p * 100}%`}
                                 </button>
@@ -75,7 +77,7 @@ export default function TradeForm({
                         placeholder="0"
                         className={`bg-transparent border-none outline-none text-[24px] md:text-[32px] font-semibold placeholder-[#3B3C40] w-full mr-4 ${isBuy ? 'text-white' : 'text-[#F0B118]'}`}
                     />
-                    <div className="flex items-center gap-2 bg-[#1A1A1A] px-3 py-[6px] rounded-full border border-[#2E2E2E] min-w-[90px] md:min-w-[100px]">
+                    <div className="flex items-center gap-2 bg-[#1A1A1A] px-3 py-[6px] rounded-full border border-[#2E2E2E] min-w-[90px] md:min-w-[100px] justify-center">
                         <div className="w-5 h-5 relative flex-shrink-0">
                             <Image
                                 src={isBuy ? "/images/USDT.png" : "/images/AGLD.svg"}
@@ -89,9 +91,9 @@ export default function TradeForm({
                         </span>
                     </div>
                 </div>
-                <div className="mt-2 flex items-center justify-between text-[12px] md:text-[13px] text-[#8C8D91] font-inter">
+                <div className="mt-2 flex items-center justify-between text-[12px] md:text-[13px] text-[#8C8D91] font-inter h-[18px]">
                     <span>${payUsdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}</span>
-                    <span>{isBuy ? `${usdBalance.toLocaleString(undefined, { maximumFractionDigits: 4 })} USDT` : `${goldBalance.toLocaleString(undefined, { maximumFractionDigits: 4 })} AGLD`}</span>
+                    <span className={isConnected ? "opacity-100" : "opacity-0"}>{isBuy ? `${usdBalance.toLocaleString(undefined, { maximumFractionDigits: 4 })} USDT` : `${goldBalance.toLocaleString(undefined, { maximumFractionDigits: 4 })} AGLD`}</span>
                 </div>
             </div>
 
@@ -117,7 +119,7 @@ export default function TradeForm({
                         placeholder="0"
                         className={`bg-transparent border-none outline-none text-[24px] md:text-[32px] font-semibold placeholder-[#3B3C40] w-full mr-4 ${isBuy ? 'text-[#F0B118]' : 'text-white'}`}
                     />
-                    <div className="flex items-center gap-2 bg-[#1A1A1A] px-1 md:px-3 py-[6px] rounded-full border border-[#2E2E2E] min-w-[90px] md:min-w-[100px] justify-center">
+                    <div className="flex items-center gap-2 bg-[#1A1A1A] px-3 py-[6px] rounded-full border border-[#2E2E2E] min-w-[90px] md:min-w-[100px] justify-center">
                         <div className="w-5 h-5 relative flex-shrink-0">
                             <Image
                                 src={isBuy ? "/images/AGLD.svg" : "/images/USDT.png"}
@@ -131,9 +133,9 @@ export default function TradeForm({
                         </span>
                     </div>
                 </div>
-                <div className="mt-2 flex items-center justify-between text-[12px] md:text-[13px] text-[#8C8D91] font-inter">
+                <div className="mt-2 flex items-center justify-between text-[12px] md:text-[13px] text-[#8C8D91] font-inter h-[18px]">
                     <span>${receiveUsdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}</span>
-                    <span>{isBuy ? `${goldBalance.toLocaleString(undefined, { maximumFractionDigits: 4 })} AGLD` : `${usdBalance.toLocaleString(undefined, { maximumFractionDigits: 4 })} USDT`}</span>
+                    <span className={isConnected ? "opacity-100" : "opacity-0"}>{isBuy ? `${goldBalance.toLocaleString(undefined, { maximumFractionDigits: 4 })} AGLD` : `${usdBalance.toLocaleString(undefined, { maximumFractionDigits: 4 })} USDT`}</span>
                 </div>
             </div>
         </div>

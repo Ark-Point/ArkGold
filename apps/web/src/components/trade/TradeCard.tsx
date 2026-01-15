@@ -5,7 +5,12 @@ import TradeForm from "./TradeForm";
 import TransactionModal from "./TransactionModal";
 import ConfirmationModal from "./ConfirmationModal";
 
-export default function TradeCard() {
+interface TradeCardProps {
+    isConnected: boolean;
+    setIsConnected: (value: boolean) => void;
+}
+
+export default function TradeCard({ isConnected, setIsConnected }: TradeCardProps) {
     const [activeTab, setActiveTab] = useState<'Buy' | 'Sell'>('Buy');
     const [usdBalance, setUsdBalance] = useState(5324.50);
     const [goldBalance, setGoldBalance] = useState(42.8);
@@ -125,6 +130,7 @@ export default function TradeCard() {
                     usdBalance={usdBalance}
                     goldBalance={goldBalance}
                     goldPrice={goldPrice}
+                    isConnected={isConnected}
                 />
 
                 {/* Action Button */}
@@ -138,14 +144,21 @@ export default function TradeCard() {
                     </div>
 
                     <button
-                        onClick={() => setIsReviewing(true)}
-                        disabled={!payAmount || parseFloat(payAmount) <= 0}
-                        className={`w-full h-[52px] md:h-[60px] rounded-xl font-inter font-semibold text-[16px] transition-all cursor-pointer ${!payAmount || parseFloat(payAmount) <= 0
-                            ? 'bg-[#1A1A1A] text-[#3B3C40] cursor-not-allowed border border-[#2E2E2E]'
-                            : 'bg-[#F0B118] text-black hover:bg-[#E0A008] active:scale-[0.98]'
+                        onClick={() => {
+                            if (!payAmount || parseFloat(payAmount) <= 0) return;
+                            isConnected ? setIsReviewing(true) : setIsConnected(true);
+                        }}
+                        className={`w-full h-[52px] md:h-[60px] rounded-xl font-inter font-semibold text-[16px] transition-all cursor-pointer active:scale-[0.98]
+                            ${!payAmount || parseFloat(payAmount) <= 0
+                                ? 'bg-[#1A1A1A] text-[#3B3C40] cursor-not-allowed border border-[#2E2E2E]'
+                                : (!isConnected
+                                    ? 'bg-[#1a1a1a] text-[#F0B118] border-[2px] border-[#F0B118]'
+                                    : 'bg-[#F0B118] text-black hover:bg-[#E0A008]')
                             }`}
                     >
-                        Review Order
+                        {!payAmount || parseFloat(payAmount) <= 0
+                            ? 'Enter an amount'
+                            : (isConnected ? 'Review Order' : 'Connect Wallet')}
                     </button>
                 </div>
 
