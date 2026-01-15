@@ -1,19 +1,23 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Header from "@/components/layout/Header";
-import MobileHero from "@/components/home/mobile/Hero";
-import MobileVideoSection from "@/components/home/mobile/VideoSection";
-import MobileBenefitsSection from "@/components/home/mobile/BenefitsSection";
-import MobilePartnersSection from "@/components/home/mobile/PartnersSection";
-import MobileContactSection from "@/components/home/mobile/ContactSection";
-import MobileFooter from "@/components/home/mobile/Footer";
-import Hero from "@/components/home/mobile/Hero";
-import VideoSection from "@/components/home/VideoSection";
-import BenefitsSection from "@/components/home/mobile/BenefitsSection";
-import PartnersSection from "@/components/home/PartnersSection";
 import ContactSection from "@/components/home/ContactSection";
 import Footer from "@/components/home/Footer";
+import {
+  default as BenefitsSection,
+  default as MobileBenefitsSection,
+} from "@/components/home/mobile/BenefitsSection";
+import MobileContactSection from "@/components/home/mobile/ContactSection";
+import MobileFooter from "@/components/home/mobile/Footer";
+import {
+  default as Hero,
+  default as MobileHero,
+} from "@/components/home/mobile/Hero";
+import MobilePartnersSection from "@/components/home/mobile/PartnersSection";
+import MobileVideoSection from "@/components/home/mobile/VideoSection";
+import PartnersSection from "@/components/home/PartnersSection";
+import VideoSection from "@/components/home/VideoSection";
+import Header from "@/components/layout/Header";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   /* State */

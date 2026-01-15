@@ -1,3 +1,5 @@
+import { ContractProvider } from "@/providers/contract-provider";
+import WagmiAppProvider from "@/providers/wagmi-provider";
 import type { Metadata } from "next";
 import { Inter, Lora } from "next/font/google";
 import "./globals.css";
@@ -27,7 +29,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${lora.variable}`}>
       <body className="antialiased bg-background text-foreground font-sans">
-        {children}
+        <WagmiAppProvider>
+          <ContractProvider>{children}</ContractProvider>
+        </WagmiAppProvider>
       </body>
     </html>
   );
