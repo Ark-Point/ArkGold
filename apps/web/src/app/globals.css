@@ -187,3 +187,19 @@
 .percent-button-delay-3 {
     transition-delay: 180ms;
 }
+
+@keyframes dropdown-fade {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-dropdown-fade {
+    animation: dropdown-fade 0.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
