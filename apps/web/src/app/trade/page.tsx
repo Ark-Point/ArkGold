@@ -10,14 +10,11 @@ import { useState } from "react";
 
 import { useAccount, useDisconnect } from "wagmi";
 export default function TradePage() {
-  const [walletAddress, setWalletAddress] = useState<string | undefined>(
-    undefined
-  );
   const [isDisconnectModalOpen, setIsDisconnectModalOpen] = useState(false);
   const [isToastVisible, setIsToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
 
-  const { isConnected } = useAccount();
+  const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
 
   const { openConnectModal } = useConnectModal();
@@ -77,7 +74,7 @@ export default function TradePage() {
 
       <TradeHeader
         isConnected={isConnected}
-        address={walletAddress}
+        address={address}
         onConnect={handleConnect}
         onDisconnectClick={() => setIsDisconnectModalOpen(true)}
         onCopy={() => showToast("Wallet address copied")}
