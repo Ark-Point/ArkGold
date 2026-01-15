@@ -13,7 +13,7 @@ contract ArkGold is ERC20, AccessControl, IMintableBurnable {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
-    // --- IMintableBurnable 구현 ---
+    // --- IMintableBurnable Implementation ---
 
     function mint(address to, uint256 amount) external override onlyRole(MINTER_ROLE) {
         _mint(to, amount);

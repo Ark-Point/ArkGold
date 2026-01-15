@@ -1,4 +1,4 @@
-import { ethers, run, network } from "hardhat";
+import { ethers, network, run } from "hardhat";
 import { prompt } from "prompts";
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -114,21 +114,21 @@ async function main() {
   console.log("\n🎉 All Done! ArkGold System is ready on", (await ethers.provider.getNetwork()).name);
 
   // ------------------------------------------------------
-  // 3. 초기 세팅 (Initial Liquidity)
+  // 3. Initial Setup (Initial Liquidity)
   // ------------------------------------------------------
   console.log("\n💧 Minting Initial Gold (1kg)...");
-  // 1kg 바 (1000g)
+  // 1kg Bar (1000g)
   const weight1kg = ethers.utils.parseUnits("1000", 18);
   await nft.mint(deployer.address, 1, weight1kg, "GENESIS-BAR-1KG");
-  // 금고로 전송
+  // Transfer to Vault
   await nft.safeTransferFrom(deployer.address, goldVault.address, 1, 1, "0x");
   console.log("✅ Initial 1kg Gold Deposited into Vault!");
 
   // ------------------------------------------------------
-  // 4. 검증 (Verification)
+  // 4. Verification
   // ------------------------------------------------------
   console.log("\n⏳ Waiting for block confirmations before verification...");
-  // Mantle은 빠르지만, Explorer 인덱싱을 위해 15~30초 대기 추천
+  // Mantle is fast, but recommend waiting 15-30s for Explorer indexing
   await delay(20000); 
 
   console.log("🔍 Starting Verification...");

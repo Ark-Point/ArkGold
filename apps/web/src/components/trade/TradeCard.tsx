@@ -69,9 +69,6 @@ export default function TradeCard({
   const usdBalance = parseFloat(tokenBalances?.usdt.amount ?? "0");
   const goldBalance = parseFloat(tokenBalances?.agld.amount ?? "0");
 
-  console.log("goldPrice:", goldPrice);
-  console.log("tokenBalances:", tokenBalances);
-
   const handlePayChange = (value: string) => {
     setPayAmount(value);
     setActivePercent(null); // Reset active state on manual input
@@ -111,7 +108,18 @@ export default function TradeCard({
   const handlePercentClick = (percent: number) => {
     setActivePercent(percent);
     const balance = activeTab === "Buy" ? usdBalance : goldBalance;
-    const amount = (balance * percent).toString();
+    const decimals = activeTab === "Buy" ? usdtDecimals : agldDecimals;
+
+    // Calculate amount safely handling decimals
+    const rawAmount = balance * percent;
+    const amountStr = rawAmount.toString();
+    const parts = amountStr.split(".");
+    
+    // Truncate (floor) to prevent exceeding decimals, which causes ethers error
+    let amount = amountStr;
+    if (parts.length > 1 && parts[1].length > decimals) {
+      amount = `${parts[0]}.${parts[1].substring(0, decimals)}`;
+    }
 
     // Use a variant of handlePayChange that doesn't reset the percent
     setPayAmount(amount);

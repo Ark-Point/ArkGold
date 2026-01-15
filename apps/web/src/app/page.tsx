@@ -3,14 +3,14 @@
 import ContactSection from "@/components/home/ContactSection";
 import Footer from "@/components/home/Footer";
 import {
-  default as BenefitsSection,
-  default as MobileBenefitsSection,
+    default as BenefitsSection,
+    default as MobileBenefitsSection,
 } from "@/components/home/mobile/BenefitsSection";
 import MobileContactSection from "@/components/home/mobile/ContactSection";
 import MobileFooter from "@/components/home/mobile/Footer";
 import {
-  default as Hero,
-  default as MobileHero,
+    default as Hero,
+    default as MobileHero,
 } from "@/components/home/mobile/Hero";
 import MobilePartnersSection from "@/components/home/mobile/PartnersSection";
 import MobileVideoSection from "@/components/home/mobile/VideoSection";
@@ -29,14 +29,14 @@ export default function Home() {
   /* PC vs Mobile Check */
   useEffect(() => {
     const handleResize = () => {
-      // 768px 미만이면 모바일로 간주 (Tailwind md breakpoint 기준)
+      // Consider mobile if less than 768px (Based on Tailwind md breakpoint)
       setIsMobile(window.innerWidth < 768);
     };
 
-    // 초기값 설정
+    // Set initial value
     handleResize();
 
-    // 리사이즈 이벤트 리스너
+    // Resize event listener
     window.addEventListener("resize", handleResize);
 
     return () => window.removeEventListener("resize", handleResize);

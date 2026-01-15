@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import MobileToast from "./MobileToast";
 
 interface ContactInputProps {
@@ -189,47 +189,47 @@ export default function ContactSection() {
     const showEmailError = touched.email && !isEmailValid;
     const showNameError = touched.name && !isNameValid;
 
-    // 그룹 기반 스크롤: [현재 인풋 + 다음 요소]의 하단을 키보드 위 24px에 위치
+    // Group-based scroll: Position bottom of [current input + next element] 24px above keyboard
     const scrollToInputGroup = (fieldId: string) => {
         if (!window.visualViewport) return;
 
         const viewport = window.visualViewport;
         const viewportHeight = viewport.height;
 
-        // 현재 포커스된 인풋의 wrapper 찾기
+        // Find wrapper of currently focused input
         const currentInput = document.getElementById(`mobile-${fieldId}`);
         if (!currentInput) return;
 
         const currentWrapper = currentInput.closest('.relative.w-full') as HTMLElement;
         if (!currentWrapper) return;
 
-        // 다음 요소 찾기
+        // Find next element
         let nextElement: HTMLElement | null = null;
 
         if (fieldId === 'email') {
-            // Email → Name 인풋 wrapper
+            // Email -> Name input wrapper
             const nameInput = document.getElementById('mobile-name');
             nextElement = nameInput?.closest('.relative.w-full') as HTMLElement;
         } else if (fieldId === 'name') {
-            // Name → Message 인풋 wrapper
+            // Name -> Message input wrapper
             const messageInput = document.getElementById('mobile-message');
             nextElement = messageInput?.closest('.relative.w-full') as HTMLElement;
         } else if (fieldId === 'message') {
-            // Message → Submit 버튼
+            // Message -> Submit button
             nextElement = document.querySelector('.mobile-submit-button') as HTMLElement;
         }
 
         if (!nextElement) return;
 
-        // 다음 요소의 하단 위치 (viewport 기준)
+        // Bottom position of next element (viewport based)
         const nextElementRect = nextElement.getBoundingClientRect();
         const nextElementBottom = nextElementRect.bottom;
 
-        // 목표: 다음 요소의 하단이 viewport 하단에서 24px 위에 위치
+        // Goal: Position next element bottom 24px above viewport bottom
         const targetPosition = viewportHeight - 24;
         const scrollAmount = nextElementBottom - targetPosition;
 
-        // 스크롤 실행
+        // Execute scroll
         if (scrollAmount > 0) {
             window.scrollBy({
                 top: scrollAmount,
@@ -238,7 +238,7 @@ export default function ContactSection() {
         }
     };
 
-    // Visual Viewport API - 키보드 감지 및 자동 스크롤
+    // Visual Viewport API - Keyboard detection and auto scroll
     useEffect(() => {
         if (typeof window === 'undefined' || !window.visualViewport) return;
 
@@ -250,16 +250,16 @@ export default function ContactSection() {
             const windowHeight = window.innerHeight;
             const calculatedKeyboardHeight = windowHeight - viewportHeight;
 
-            // 키보드 높이 업데이트 (100px 이상일 때만 키보드로 간주)
+            // Update keyboard height (Consider keyboard if > 100px)
             if (calculatedKeyboardHeight > 100) {
                 setKeyboardHeight(calculatedKeyboardHeight);
 
-                // 키보드가 완전히 올라온 후 스크롤 (debounce)
+                // Scroll after keyboard is fully up (debounce)
                 if (scrollTimeoutRef.current) {
                     clearTimeout(scrollTimeoutRef.current);
                 }
                 scrollTimeoutRef.current = setTimeout(() => {
-                    // 현재 포커스된 필드가 있으면 그룹 스크롤 실행
+                    // Execute group scroll if field is focused
                     if (focusedField) {
                         scrollToInputGroup(focusedField);
                     }
@@ -269,7 +269,7 @@ export default function ContactSection() {
             }
         };
 
-        // resize와 scroll 이벤트 모두 감지
+        // Detect both resize and scroll events
         window.visualViewport.addEventListener('resize', handleViewportChange);
         window.visualViewport.addEventListener('scroll', handleViewportChange);
 
@@ -284,11 +284,11 @@ export default function ContactSection() {
         };
     }, [focusedField]);
 
-    // 인풋 포커스 시 그룹 스크롤
+    // Group scroll on input focus
     const handleFocus = (fieldId: string) => {
         setFocusedField(fieldId);
 
-        // 키보드 애니메이션 대기 후 그룹 스크롤
+        // Group scroll after waiting for keyboard animation
         setTimeout(() => {
             scrollToInputGroup(fieldId);
         }, 400);
@@ -299,19 +299,19 @@ export default function ContactSection() {
     };
 
     const handleSubmit = () => {
-        // 키보드 해제
+        // Dismiss keyboard
         (document.activeElement as HTMLElement)?.blur();
         setFocusedField(null);
 
-        // 폼 유효성 검사
+        // Form validation
         if (isFormValid) {
-            // 성공: 폼 초기화 및 버튼 Default 상태 복구
+            // Success: Reset form and restore button default state
             setFormData({ email: "", name: "", message: "" });
             setTouched({ email: false, name: false });
             setToastSuccess(true);
             setShowToast(true);
         } else {
-            // 실패: 버튼 Active 상태 유지 (재시도 가능)
+            // Failure: Keep button active (Retry available)
             setToastSuccess(false);
             setShowToast(true);
         }

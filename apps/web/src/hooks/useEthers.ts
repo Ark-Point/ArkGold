@@ -1,5 +1,5 @@
 import type { ExternalProvider } from "@ethersproject/providers";
-import { providers } from "ethers"; // v5 방식
+import { providers } from "ethers"; // v5 style
 import * as React from "react";
 import { type Account, type Chain, type Client, type Transport } from "viem";
 import { type Config, useConnectorClient } from "wagmi";

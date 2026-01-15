@@ -1,8 +1,8 @@
-import * as dotenv from "dotenv";
 import "@nomicfoundation/hardhat-chai-matchers";
 import "@nomicfoundation/hardhat-foundry";
 import "@nomicfoundation/hardhat-network-helpers";
 import "@nomicfoundation/hardhat-verify";
+import * as dotenv from "dotenv";
 
 import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-truffle5";
@@ -65,9 +65,9 @@ const config: HardhatUserConfig = {
     enabled: false,
   },
   mocha: {
-    timeout: 20000, // 20초
-    bail: false, // 첫 실패에서 멈추지 않음
-    parallel: false, // 병렬 실행 비활성화 (기본은 false)
+    timeout: 20000, // 20 seconds
+    bail: false, // Do not stop on first failure
+    parallel: false, // Disable parallel execution (default is false)
   },
 };
 

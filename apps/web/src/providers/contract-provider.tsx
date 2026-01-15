@@ -13,7 +13,7 @@ import {
 import { Signer, providers } from "ethers";
 import React, { createContext, useContext, useMemo } from "react";
 
-// 사용할 컨트랙트 타입 정의
+// Define Contract types
 interface ContractMap {
   exchanger: ArkGoldExchanger | null;
   arkGoldToken: ArkGold | null;
@@ -33,19 +33,19 @@ const ContractContext = createContext<ContractContextType | undefined>(
 export const ContractProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  // [핵심] Wagmi에서 변환된 Ethers Signer를 가져옴
-  // 지갑이 연결되면 signer가 생기고, 연결 끊기면 undefined가 됨
+  // [Core] Get Ethers Signer converted from Wagmi
+  // Signer is available when wallet is connected, otherwise undefined
   const signer = useEthersSigner({ chainId: config.mantle.chainId });
 
-  // provider는 useMemo로 감싸는 것이 좋습니다. (매 렌더링마다 생성되지 않도록)
+  // Wrap provider with useMemo (to avoid recreation on every render)
   const provider = useMemo(() => {
     return new providers.JsonRpcProvider(config.mantle.rpcUrl);
   }, []);
 
   const contracts = useMemo(() => {
     try {
-      // [TypeChain] Signer를 주입하여 연결된 인스턴스 생성
-      // 이제 이 인스턴스로 .buyGold() 호출 시 지갑 서명창이 뜹니다.
+      // [TypeChain] Create connected instance by injecting Signer
+      // Now invoking .buyGold() with this instance will prompt wallet signature
 
       const exchanger = ArkGoldExchanger__factory.connect(
         config.contract.Exchanger,
@@ -71,7 +71,7 @@ export const ContractProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const isLoading = !signer || !contracts.exchanger;
 
-  // value 객체도 메모이제이션
+  // Memoize value object
   const value = useMemo(
     () => ({ contracts, isLoading, signer }),
     [contracts, isLoading, signer]

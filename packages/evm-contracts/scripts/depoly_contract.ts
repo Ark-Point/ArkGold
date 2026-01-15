@@ -46,21 +46,21 @@ import { prompt } from "prompts";
     await hre.run("verify:verify", {
       address: instance.address,
       constructorArguments: [operator.address],
-      network: "polygon", // 하드햇 네트워크 설정명
+      network: "polygon", // Hardhat network configuration name
     });
   } catch (error: any) {
     if (error.message.toLowerCase().includes("already verified")) {
       console.log(
-        `💎 ${contractName} (${network.name}) [${instance.address}] 이미 검증됨`,
+        `💎 ${contractName} (${network.name}) [${instance.address}] already verified`,
       );
     } else if (error.message.toLowerCase().includes("pending")) {
       console.log(
-        `🟡  ${contractName} (${network.name}) [${instance.address}] 검증 대기중`,
+        `🟡  ${contractName} (${network.name}) [${instance.address}] verification pending`,
       );
     } else {
       // console.log(
-      //   `🔴 ${contractName} (${network.name}) [${instance.address}] 검증 오류: ${error.message}\n` +
-      //     `수동 검증 URL: ${blockExplorerUrl}/verifyContract?a=${instance.address}`,
+      //   `🔴 ${contractName} (${network.name}) [${instance.address}] verification error: ${error.message}\n` +
+      //     `Manual verification URL: ${blockExplorerUrl}/verifyContract?a=${instance.address}`,
       // );
     }
   }

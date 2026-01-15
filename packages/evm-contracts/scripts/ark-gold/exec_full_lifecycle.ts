@@ -54,7 +54,7 @@ async function main() {
   const pricePerOunce = await exchanger.getGoldPrice();
   console.log(`   📊 Gold Price: $${ethers.utils.formatUnits(pricePerOunce, 18)} / Oz`);
 
-  // 37.5g은 -> 1.205 Oz
+  // 37.5g -> 1.205 Oz
   const requiredOz = await exchanger.previewRedeem(TOKEN_ID);
   console.log(`   ⚖️ Required for Redeem: ${ethers.utils.formatUnits(requiredOz, 18)} AGLD`);
 

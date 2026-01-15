@@ -6,7 +6,7 @@ export const useTokenBalances = () => {
   const { contracts, signer } = useContract();
 
   return useQuery({
-    queryKey: ["balances", signer?.getAddress], // 주소가 바뀌면 다시 조회
+    queryKey: ["balances", signer?.getAddress], // Refetch when address changes
     queryFn: async () => {
       if (!signer || !contracts.usdt || !contracts.arkGoldToken) {
         return {

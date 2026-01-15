@@ -1,6 +1,6 @@
+import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 
 describe("ArkGold RWA Protocol Real-World Price Test", function () {
   
@@ -98,7 +98,7 @@ describe("ArkGold RWA Protocol Real-World Price Test", function () {
       const { goldVault, nft, deployer } = await loadFixture(deployProtocolFixture);
       
       // 100g gold nft mint(amount: 2) - (ID: 101, 102)
-      // weight는 그램(g) 단위 입력: 100 * 10^18
+      // Input weight in grams (g): 100 * 10^18
       const weight100g = ethers.utils.parseUnits("100", 18);
       await nft.mint(deployer.address, 101, weight100g, "BAR-101");
       await nft.mint(deployer.address, 102, weight100g, "BAR-102");
@@ -128,7 +128,7 @@ describe("ArkGold RWA Protocol Real-World Price Test", function () {
       await nft.mint(deployer.address, 999, weight1kg, "BAR-1KG");
       await nft.safeTransferFrom(deployer.address, goldVault.address, 999, 1, "0x");
 
-      // 4622.30 -> 6 decimals 변환
+      // Convert 4622.30 -> 6 decimals
       const usdtAmount = ethers.utils.parseUnits("4622.3", 6);
       
       await expect(exchanger.connect(user1).buyGold(usdtAmount, 0))
