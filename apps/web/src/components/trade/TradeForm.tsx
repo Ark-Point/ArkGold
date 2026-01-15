@@ -1,5 +1,5 @@
-import { useState } from "react";
 import Image from "next/image";
+import { useState } from "react";
 
 interface TradeFormProps {
     activeTab: 'Buy' | 'Sell';
@@ -12,6 +12,8 @@ interface TradeFormProps {
     goldBalance: number;
     goldPrice: number;
     isConnected: boolean;
+    isPriceLoading?: boolean;
+    isBalancesLoading?: boolean;
 }
 
 export default function TradeForm({
@@ -24,7 +26,9 @@ export default function TradeForm({
     usdBalance,
     goldBalance,
     goldPrice,
-    isConnected
+    isConnected,
+    isPriceLoading = false,
+    isBalancesLoading = false
 }: TradeFormProps) {
     const [isPayFocused, setIsPayFocused] = useState(false);
     const isBuy = activeTab === 'Buy';
@@ -41,6 +45,10 @@ export default function TradeForm({
     // Calculate USD value for the input amounts
     const payUsdValue = payAmount ? (isBuy ? parseFloat(payAmount) : parseFloat(payAmount) * goldPrice) : 0;
     const receiveUsdValue = receiveAmount ? (isBuy ? parseFloat(receiveAmount) * goldPrice : parseFloat(receiveAmount)) : 0;
+
+    const Skeleton = ({ className = "h-4 w-16" }: { className?: string }) => (
+        <div className={`${className} bg-[#2E2E2E] animate-pulse rounded`} />
+    );
 
     return (
         <div className="w-full relative flex flex-col gap-1">
@@ -92,8 +100,21 @@ export default function TradeForm({
                     </div>
                 </div>
                 <div className="mt-2 flex items-center justify-between text-[12px] md:text-[13px] text-[#8C8D91] font-inter h-[18px]">
-                    <span>${payUsdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}</span>
-                    <span className={isConnected ? "opacity-100" : "opacity-0"}>{isBuy ? `${usdBalance.toLocaleString(undefined, { maximumFractionDigits: 4 })} USDT` : `${goldBalance.toLocaleString(undefined, { maximumFractionDigits: 4 })} AGLD`}</span>
+                    {isPriceLoading && payUsdValue > 0 ? (
+                        <Skeleton className="h-4 w-20" />
+                    ) : (
+                        <span>${payUsdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}</span>
+                    )}
+                    
+                    {isConnected ? (
+                        isBalancesLoading ? (
+                           <Skeleton className="h-4 w-24" />
+                        ) : (
+                            <span className="opacity-100">{isBuy ? `${usdBalance.toLocaleString(undefined, { maximumFractionDigits: 4 })} USDT` : `${goldBalance.toLocaleString(undefined, { maximumFractionDigits: 4 })} AGLD`}</span>
+                        )
+                    ) : (
+                        <span className="opacity-0">Placeholder</span>
+                    )}
                 </div>
             </div>
 
@@ -134,8 +155,21 @@ export default function TradeForm({
                     </div>
                 </div>
                 <div className="mt-2 flex items-center justify-between text-[12px] md:text-[13px] text-[#8C8D91] font-inter h-[18px]">
-                    <span>${receiveUsdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}</span>
-                    <span className={isConnected ? "opacity-100" : "opacity-0"}>{isBuy ? `${goldBalance.toLocaleString(undefined, { maximumFractionDigits: 4 })} AGLD` : `${usdBalance.toLocaleString(undefined, { maximumFractionDigits: 4 })} USDT`}</span>
+                    {isPriceLoading && receiveUsdValue > 0 ? (
+                        <Skeleton className="h-4 w-20" />
+                    ) : (
+                         <span>${receiveUsdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}</span>
+                    )}
+                   
+                    {isConnected ? (
+                        isBalancesLoading ? (
+                             <Skeleton className="h-4 w-24" />
+                        ) : (
+                             <span className="opacity-100">{isBuy ? `${goldBalance.toLocaleString(undefined, { maximumFractionDigits: 4 })} AGLD` : `${usdBalance.toLocaleString(undefined, { maximumFractionDigits: 4 })} USDT`}</span>
+                        )
+                    ) : (
+                        <span className="opacity-0">Placeholder</span>
+                    )}
                 </div>
             </div>
         </div>

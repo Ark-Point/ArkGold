@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 
 interface TransactionModalProps {
     isOpen: boolean;
@@ -10,6 +9,7 @@ interface TransactionModalProps {
     amount: string;
     price: string;
     total: string;
+    txHash?: string;
     newBalance: {
         usd: string;
         gold: string;
@@ -23,6 +23,7 @@ export default function TransactionModal({
     amount,
     price,
     total,
+    txHash,
     newBalance
 }: TransactionModalProps) {
     const [isClosing, setIsClosing] = useState(false);
@@ -37,7 +38,12 @@ export default function TransactionModal({
         }, 300); // Animation duration
     };
 
-    const transactionId = `#AG-${Math.floor(Math.random() * 1000000).toString().padStart(6, '0')}`;
+    const displayTxId = txHash 
+        ? `${txHash.slice(0, 6)}...${txHash.slice(-4)}`
+        : `#AG-${Math.floor(Math.random() * 1000000).toString().padStart(6, '0')}`;
+        
+    const txLink = txHash ? `https://sepolia.mantlescan.xyz/tx/${txHash}` : null;
+
     const timestamp = new Date().toLocaleString('en-US', {
         year: 'numeric',
         month: 'short',
@@ -89,7 +95,24 @@ export default function TransactionModal({
                     {/* Receipt Details */}
                     <div className="w-full bg-[#1A1A1A] border border-[#2E2E2E] rounded-[16px] p-[24px] mb-6 md:mb-[32px]">
                         <div className="flex flex-col gap-[16px]">
-                            <DetailRow label="Transaction ID" value={transactionId} />
+                            {txLink ? (
+                                <div className="flex items-center justify-between">
+                                    <span className="font-inter text-[15px] text-[#8C8D91]">Transaction ID</span>
+                                    <a 
+                                        href={txLink} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="font-inter text-[15px] text-[#F0B118] hover:underline transition-colors flex items-center gap-1"
+                                    >
+                                        {displayTxId}
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        </svg>
+                                    </a>
+                                </div>
+                            ) : (
+                                <DetailRow label="Transaction ID" value={displayTxId} />
+                            )}
                             <DetailRow label="Time" value={timestamp} />
                             <DetailRow label="Type" value={`${type} Gold`} valueColor={type === 'Buy' ? '#34C86E' : '#FF4D4D'} />
                             <DetailRow label="Quantity" value={`${formatWithEllipsis(amount, type === 'Buy' ? 6 : 2)} AGLD`} />

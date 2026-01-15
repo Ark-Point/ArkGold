@@ -1,6 +1,10 @@
 "use client";
 
+import { useAllowance } from "@/hooks/useAllowance";
+import { useApproveUSDT } from "@/hooks/useApproveUSDT";
+import { useBuyGold } from "@/hooks/useBuyGold";
 import { useGoldPrice } from "@/hooks/useGoldPrice";
+import { useSellGold } from "@/hooks/useSellGold";
 import { useTokenBalances } from "@/hooks/useTokenBalances";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { BigNumber, utils } from "ethers";
@@ -31,6 +35,7 @@ export default function TradeCard({
     amount: string;
     total: string;
     type: "Buy" | "Sell";
+    txHash?: string;
   } | null>(null);
 
   const { address } = useAccount();
@@ -59,7 +64,7 @@ export default function TradeCard({
     () => goldPriceData ?? { raw: BigNumber.from(0), amount: "0" },
     [goldPriceData]
   );
-  
+
   // Real balances
   const usdBalance = parseFloat(tokenBalances?.usdt.amount ?? "0");
   const goldBalance = parseFloat(tokenBalances?.agld.amount ?? "0");
@@ -77,32 +82,28 @@ export default function TradeCard({
 
     // Zero check for price to prevent div by zero
     if (goldPrice.raw.eq(0)) {
-        return;
+      return;
     }
 
     if (activeTab === "Buy") {
       // Pay USDT -> Receive AGLD
       const usdtIn = utils.parseUnits(value || "0", usdtDecimals); // BigNumber
 
-      // 2️⃣ AGLD 수량 계산
+      // 2. Calculate AGLD Amount
       // Calculation: (USDT * 1e30) / PriceWei = AGLD (18 decimals)
       // Scaling: 6 (USDT) + 30 = 36. Price is 18. Result 18.
-      const agldOut = usdtIn
-        .mul(BigNumber.from(10).pow(30))
-        .div(goldPrice.raw);
+      const agldOut = usdtIn.mul(BigNumber.from(10).pow(30)).div(goldPrice.raw);
 
-      // 3️⃣ UI 표시
+      // 3. Update UI
       setReceiveAmount(utils.formatUnits(agldOut, agldDecimals));
     } else {
       // Pay AGLD -> Receive USDT
       const agldIn = utils.parseUnits(value || "0", agldDecimals);
-      
+
       // Calculation: (AGLD * PriceWei) / 1e30 = USDT (6 decimals)
       // Scaling: 18 (AGLD) + 18 (Price) = 36. Divide by 30 = 6.
-      const usdtOut = agldIn
-        .mul(goldPrice.raw)
-        .div(BigNumber.from(10).pow(30));
-        
+      const usdtOut = agldIn.mul(goldPrice.raw).div(BigNumber.from(10).pow(30));
+
       setReceiveAmount(utils.formatUnits(usdtOut, usdtDecimals));
     }
   };
@@ -114,45 +115,69 @@ export default function TradeCard({
 
     // Use a variant of handlePayChange that doesn't reset the percent
     setPayAmount(amount);
-    
+
     // Zero check
     if (goldPrice.raw.eq(0)) {
-        return;
+      return;
     }
 
     if (activeTab === "Buy") {
       const usdtIn = utils.parseUnits(amount || "0", usdtDecimals); // BigNumber
-      
-      const agldOut = usdtIn
-        .mul(BigNumber.from(10).pow(30))
-        .div(goldPrice.raw);
-        
+
+      const agldOut = usdtIn.mul(BigNumber.from(10).pow(30)).div(goldPrice.raw);
+
       setReceiveAmount(utils.formatUnits(agldOut, agldDecimals));
     } else {
       const agldIn = utils.parseUnits(amount || "0", agldDecimals);
-      
-      const usdtOut = agldIn
-        .mul(goldPrice.raw)
-        .div(BigNumber.from(10).pow(30));
-        
+
+      const usdtOut = agldIn.mul(goldPrice.raw).div(BigNumber.from(10).pow(30));
+
       setReceiveAmount(utils.formatUnits(usdtOut, usdtDecimals));
     }
   };
 
-  const handleTradeExecute = () => {
+  const { data: allowance } = useAllowance();
+  const approveMutation = useApproveUSDT();
+  const buyMutation = useBuyGold();
+  const sellMutation = useSellGold();
+
+  const handleTradeExecute = async () => {
     setIsProcessing(true);
-    setTimeout(() => {
-      setIsProcessing(false);
-      setIsReviewing(false);
+    try {
+      let receipt;
+
+      if (activeTab === "Buy") {
+        // 1. Check Allowance
+        const currentAllowance = parseFloat(allowance || "0");
+        const payNum = parseFloat(payAmount);
+
+        if (currentAllowance < payNum) {
+          await approveMutation.mutateAsync(payAmount);
+        }
+
+        // 2. Buy Gold
+        receipt = await buyMutation.mutateAsync(payAmount);
+      } else {
+        // Sell Gold
+        receipt = await sellMutation.mutateAsync(payAmount);
+      }
+
       setLastTransaction({
         amount: activeTab === "Buy" ? receiveAmount : payAmount,
         total: activeTab === "Buy" ? payAmount : receiveAmount,
         type: activeTab,
+        txHash: receipt.transactionHash,
       });
       setShowSuccess(true);
       setPayAmount("");
       setReceiveAmount("");
-    }, 1200);
+    } catch (error) {
+      console.error("Trade failed:", error);
+      // Optional: Show error toast/alert
+    } finally {
+      setIsProcessing(false);
+      setIsReviewing(false);
+    }
   };
 
   return (
@@ -214,20 +239,26 @@ export default function TradeCard({
           goldBalance={goldBalance}
           goldPrice={Number(goldPrice?.amount)}
           isConnected={isConnected}
+          isPriceLoading={goldPricePending}
+          isBalancesLoading={tokenBalancePending}
         />
 
         {/* Action Button */}
         <div className="mt-[42px] w-full flex flex-col items-center">
           <div className="w-full flex items-center gap-2 mb-3 px-1">
-            <span className="text-[15px] text-[#BCBCBC] font-inter font-medium leading-none">
-              {`1 AGLD (oz t) = ${Number(goldPrice.amount).toLocaleString(
-                undefined,
-                {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }
-              )} USDT`}
-            </span>
+            {goldPricePending ? (
+              <div className="h-4 w-48 bg-[#2E2E2E] animate-pulse rounded" />
+            ) : (
+                <span className="text-[15px] text-[#BCBCBC] font-inter font-medium leading-none">
+                {`1 AGLD (oz t) = ${Number(goldPrice.amount).toLocaleString(
+                    undefined,
+                    {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                    }
+                )} USDT`}
+                </span>
+            )}
             <div className="flex items-center gap-1.5 ml-1">
               <div className="w-1.5 h-1.5 bg-[#34C86E] rounded-full animate-pulse" />
               <span className="font-inter text-[11px] text-[#34C86E] font-medium tracking-wider uppercase leading-none">
@@ -241,7 +272,10 @@ export default function TradeCard({
               if (!payAmount || parseFloat(payAmount) <= 0) return;
               if (!isConnected) {
                 handleConnect();
+                return;
               }
+
+              setIsReviewing(true);
             }}
             className={`w-full h-[52px] md:h-[60px] rounded-xl font-inter font-semibold text-[16px] transition-all cursor-pointer active:scale-[0.98]
                             ${
@@ -274,6 +308,7 @@ export default function TradeCard({
         amount={lastTransaction?.amount || ""}
         price={goldPrice.amount}
         total={lastTransaction?.total || ""}
+        txHash={lastTransaction?.txHash}
         newBalance={{
           usd: usdBalance.toLocaleString(undefined, {
             minimumFractionDigits: 2,
