@@ -1,6 +1,7 @@
 "use client";
 
 import { useGoldPrice } from "@/hooks/useGoldPrice";
+import { useTokenBalances } from "@/hooks/useTokenBalances";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { BigNumber, utils } from "ethers";
 import { useMemo, useState } from "react";
@@ -19,8 +20,6 @@ export default function TradeCard({
   handleConnect,
 }: TradeCardProps) {
   const [activeTab, setActiveTab] = useState<"Buy" | "Sell">("Buy");
-  const [usdBalance, setUsdBalance] = useState(5324.5);
-  const [goldBalance, setGoldBalance] = useState(42.8);
   const [payAmount, setPayAmount] = useState("");
   const [receiveAmount, setReceiveAmount] = useState("");
 
@@ -45,6 +44,12 @@ export default function TradeCard({
     isFetching: goldPriceFetching,
   } = useGoldPrice();
 
+  const {
+    data: tokenBalances,
+    isPending: tokenBalancePending,
+    isFetching: tokenBalanceFetching,
+  } = useTokenBalances();
+
   const usdtDecimals = 6;
   const agldDecimals = 18;
   const oracleDecimals = 18;
@@ -54,16 +59,13 @@ export default function TradeCard({
     () => goldPriceData ?? { raw: BigNumber.from(0), amount: "0" },
     [goldPriceData]
   );
+  
+  // Real balances
+  const usdBalance = parseFloat(tokenBalances?.usdt.amount ?? "0");
+  const goldBalance = parseFloat(tokenBalances?.agld.amount ?? "0");
 
   console.log("goldPrice:", goldPrice);
-
-  const handleConnectWallet = () => {
-    if (!isConnected) {
-      if (!!openConnectModal) {
-        openConnectModal();
-      }
-    }
-  };
+  console.log("tokenBalances:", tokenBalances);
 
   const handlePayChange = (value: string) => {
     setPayAmount(value);
@@ -73,29 +75,34 @@ export default function TradeCard({
       return;
     }
 
-    const numValue = parseFloat(value);
+    // Zero check for price to prevent div by zero
+    if (goldPrice.raw.eq(0)) {
+        return;
+    }
 
     if (activeTab === "Buy") {
       // Pay USDT -> Receive AGLD
       const usdtIn = utils.parseUnits(value || "0", usdtDecimals); // BigNumber
 
       // 2️⃣ AGLD 수량 계산
-      // goldOutWei = usdt * 1e18 / price
+      // Calculation: (USDT * 1e30) / PriceWei = AGLD (18 decimals)
+      // Scaling: 6 (USDT) + 30 = 36. Price is 18. Result 18.
       const agldOut = usdtIn
-        .mul(BigNumber.from(10).pow(agldDecimals))
-        .mul(BigNumber.from(10).pow(oracleDecimals))
-        .div(goldPrice?.amount)
-        .div(BigNumber.from(10).pow(usdtDecimals));
+        .mul(BigNumber.from(10).pow(30))
+        .div(goldPrice.raw);
 
       // 3️⃣ UI 표시
       setReceiveAmount(utils.formatUnits(agldOut, agldDecimals));
     } else {
       // Pay AGLD -> Receive USDT
       const agldIn = utils.parseUnits(value || "0", agldDecimals);
+      
+      // Calculation: (AGLD * PriceWei) / 1e30 = USDT (6 decimals)
+      // Scaling: 18 (AGLD) + 18 (Price) = 36. Divide by 30 = 6.
       const usdtOut = agldIn
-        .mul(goldPrice?.amount)
-        .div(BigNumber.from(10).pow(oracleDecimals))
-        .div(BigNumber.from(10).pow(agldDecimals));
+        .mul(goldPrice.raw)
+        .div(BigNumber.from(10).pow(30));
+        
       setReceiveAmount(utils.formatUnits(usdtOut, usdtDecimals));
     }
   };
@@ -107,40 +114,34 @@ export default function TradeCard({
 
     // Use a variant of handlePayChange that doesn't reset the percent
     setPayAmount(amount);
+    
+    // Zero check
+    if (goldPrice.raw.eq(0)) {
+        return;
+    }
+
     if (activeTab === "Buy") {
       const usdtIn = utils.parseUnits(amount || "0", usdtDecimals); // BigNumber
+      
       const agldOut = usdtIn
-        .mul(BigNumber.from(10).pow(agldDecimals))
-        .mul(BigNumber.from(10).pow(oracleDecimals))
-        .div(goldPrice?.amount)
-        .div(BigNumber.from(10).pow(usdtDecimals));
+        .mul(BigNumber.from(10).pow(30))
+        .div(goldPrice.raw);
+        
       setReceiveAmount(utils.formatUnits(agldOut, agldDecimals));
-      //   setReceiveAmount((parseFloat(amount) / goldPrice).toFixed(8));
     } else {
       const agldIn = utils.parseUnits(amount || "0", agldDecimals);
+      
       const usdtOut = agldIn
-        .mul(goldPrice?.amount)
-        .div(BigNumber.from(10).pow(oracleDecimals))
-        .div(BigNumber.from(10).pow(agldDecimals));
+        .mul(goldPrice.raw)
+        .div(BigNumber.from(10).pow(30));
+        
       setReceiveAmount(utils.formatUnits(usdtOut, usdtDecimals));
-      //   setReceiveAmount((parseFloat(amount) * goldPrice).toFixed(8));
     }
   };
 
   const handleTradeExecute = () => {
     setIsProcessing(true);
     setTimeout(() => {
-      const payNum = parseFloat(payAmount);
-      const receiveNum = parseFloat(receiveAmount);
-
-      if (activeTab === "Buy") {
-        setUsdBalance((prev) => prev - payNum);
-        setGoldBalance((prev) => prev + receiveNum);
-      } else {
-        setGoldBalance((prev) => prev - payNum);
-        setUsdBalance((prev) => prev + receiveNum);
-      }
-
       setIsProcessing(false);
       setIsReviewing(false);
       setLastTransaction({
