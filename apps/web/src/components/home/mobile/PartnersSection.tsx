@@ -4,12 +4,16 @@ import { useState, useMemo } from "react";
 import Image from "next/image";
 
 const PARTNERS = [
-    { name: 'Aave', logo: '/images/section3-icon1.svg', description: 'Aave is a decentralized non-custodial liquidity protocol where users can participate as depositors or borrowers. depositors provide liquidity to the market to earn a passive income.' },
-    { name: 'AGORA', logo: '/images/section3-icon2.svg', description: 'Agora is an institutional-grade stablecoin issuance platform. It provides the necessary infrastructure for reliable, fiat-backed digital dollars that power global commerce and decentralized finance.' },
-    { name: 'Hex Trust', logo: '/images/section3-icon3.svg', description: 'Hex Trust is the leading institutional-grade digital asset custodian. Fully licensed and regulated, it provides bank-level security for digital assets across the globe.' },
-    { name: 'ITCEN GLOBAL', logo: '/images/section3-icon4.svg', description: 'ITCENGLOBAL is a strategic partner in digital commodity trading, bridging the gap between traditional resources and blockchain-based settlement solutions.' },
-    { name: 'MONAD', logo: '/images/section3-icon1.svg', description: 'Monad is a high-performance Ethereum-compatible L1 blockchain, optimized for ultra-high throughput and parallel execution, enabling a new generation of decentralized applications.' },
-    { name: 'Solana', logo: '/images/section3-icon2.svg', description: 'Solana is a decentralized blockchain built to enable scalable, user-friendly apps for the world. With high throughput and ultra-low fees, it provides the ideal foundation for institutional-grade digital assets.' },
+    {
+        name: 'ITCEN GROUP',
+        logo: '/images/ITCEN.png',
+        description: "South Korea's premier IT services powerhouse, ITCEN GROUP is a global leader in Web3 and RWA tokenization. By bridging physical commodities with blockchain, it architectures a massive digital ecosystem through innovative STO frameworks."
+    },
+    {
+        name: 'Korea gold exchange',
+        logo: '/images/koreagoldexchange.png',
+        description: "As the nation's largest precious metals exchange, Korea gold exchange serves as the physical foundation for the digital gold economy. It enables secure 1:1 asset-backed gold tokenization underpinned by trusted physical reserves."
+    },
 ];
 
 export default function PartnersSection() {
@@ -27,11 +31,11 @@ export default function PartnersSection() {
                     </h2>
 
                     {/* 2. Marquee Rows */}
-                    <div className="mt-[100px] flex flex-col gap-[32px] w-full overflow-hidden">
+                    <div className="mt-[90px] flex flex-col gap-[32px] w-full overflow-hidden">
                         {/* Row 1 (L->R) */}
                         <div className="relative flex whitespace-nowrap overflow-hidden">
                             <div className="flex gap-[16px] animate-marquee-ltr-fast">
-                                {[...PARTNERS, ...PARTNERS].map((partner, idx) => (
+                                {[...PARTNERS, ...PARTNERS, ...PARTNERS, ...PARTNERS, ...PARTNERS, ...PARTNERS, ...PARTNERS].map((partner, idx) => (
                                     <PartnerItem
                                         key={idx}
                                         name={partner.name}
@@ -45,7 +49,7 @@ export default function PartnersSection() {
                         {/* Row 2 (R->L slow) */}
                         <div className="relative flex whitespace-nowrap overflow-hidden">
                             <div className="flex gap-[16px] animate-marquee-rtl-slow">
-                                {[...PARTNERS, ...PARTNERS].map((partner, idx) => (
+                                {[...PARTNERS, ...PARTNERS, ...PARTNERS, ...PARTNERS, ...PARTNERS, ...PARTNERS, ...PARTNERS].map((partner, idx) => (
                                     <PartnerItem
                                         key={idx}
                                         name={partner.name}
@@ -59,7 +63,7 @@ export default function PartnersSection() {
                         {/* Row 3 (L->R slow) */}
                         <div className="relative flex whitespace-nowrap overflow-hidden">
                             <div className="flex gap-[16px] animate-marquee-ltr-slow">
-                                {[...PARTNERS, ...PARTNERS].map((partner, idx) => (
+                                {[...PARTNERS, ...PARTNERS, ...PARTNERS, ...PARTNERS, ...PARTNERS, ...PARTNERS, ...PARTNERS].map((partner, idx) => (
                                     <PartnerItem
                                         key={idx}
                                         name={partner.name}
@@ -75,16 +79,27 @@ export default function PartnersSection() {
                     <div className="mt-[80px] w-full h-[270px] px-[32px] flex flex-col">
                         <div className="w-full h-full flex flex-col items-start">
                             {/* Partner Logo */}
-                            <div className="relative w-[198px] h-[52px] flex items-center justify-start mb-6">
-                                <div className="w-full h-full bg-white/5 flex items-center justify-center rounded">
-                                    <span className="text-white font-serif text-lg">{PARTNERS[selectedIdx].name}</span>
+                            <div className="relative w-[198px] h-[52px] flex items-center justify-start mb-[34px] -mt-[10px]">
+                                <div key={selectedIdx} className="relative w-full h-full animate-fade-in-up">
+                                    <div
+                                        className={`relative w-full h-full ${PARTNERS[selectedIdx].name === 'Korea gold exchange'
+                                            ? 'scale-[1.22] translate-x-[-2px] translate-y-[5px] origin-left'
+                                            : 'translate-x-[-11px] scale-[0.81]'}`}
+                                    >
+                                        <Image
+                                            src={PARTNERS[selectedIdx].logo}
+                                            alt={PARTNERS[selectedIdx].name}
+                                            fill
+                                            className={`object-contain ${PARTNERS[selectedIdx].name === 'Korea gold exchange' ? 'brightness-0 invert' : ''}`}
+                                        />
+                                    </div>
                                 </div>
                             </div>
 
                             {/* Partner Info Text */}
-                            <div className="">
-                                <p className="font-sans font-light text-[20px] text-[#fafafa] leading-[1.3] text-left">
-                                    {PARTNERS[selectedIdx].name} provides innovative DeFi infrastructure, enabling reliable settlement by bridging digital assets with traditional resources across global markets.
+                            <div key={`desc-${selectedIdx}`} className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+                                <p className="font-sans font-light text-[18px] text-[#fafafa] leading-[1.3] text-left">
+                                    {PARTNERS[selectedIdx].description}
                                 </p>
                             </div>
                         </div>
@@ -110,11 +125,26 @@ export default function PartnersSection() {
                         <div className="font-serif text-[54px] font-normal text-white leading-tight lg:absolute lg:top-[100px]">
                             Partners
                         </div>
-                        <div className="flex flex-col items-center lg:items-start w-full mt-24 lg:mt-0 lg:absolute lg:top-[386px]">
-                            <div className="bg-zinc-900 flex items-center justify-center border border-zinc-800 w-[245px] h-[64px]">
-                                <span className="text-zinc-600 text-[12px]">Partner Logo ({PARTNERS[selectedIdx % PARTNERS.length]?.name})</span>
+                        <div className="flex flex-col items-center lg:items-start w-full mt-24 lg:mt-0 lg:absolute lg:top-[376px]">
+                            <div key={selectedIdx % PARTNERS.length} className="w-[245px] h-[64px] animate-fade-in-up">
+                                <div
+                                    className={`relative w-full h-full ${PARTNERS[selectedIdx % PARTNERS.length]?.name === 'Korea gold exchange'
+                                        ? 'translate-x-[35px] translate-y-[5px] scale-[1.35]'
+                                        : 'translate-x-[-5px] scale-[0.9]'}`}
+                                >
+                                    <Image
+                                        src={PARTNERS[selectedIdx % PARTNERS.length]?.logo}
+                                        alt={PARTNERS[selectedIdx % PARTNERS.length]?.name}
+                                        fill
+                                        className={`object-contain ${PARTNERS[selectedIdx % PARTNERS.length]?.name === 'Korea gold exchange' ? 'brightness-0 invert' : ''}`}
+                                    />
+                                </div>
                             </div>
-                            <div className="font-sans text-[20px] font-normal text-white leading-[28px] mt-6 w-full max-w-[421px] text-center lg:text-left h-auto min-h-[112px]">
+                            <div
+                                key={`desc-desk-${selectedIdx % PARTNERS.length}`}
+                                className="font-sans text-[20px] font-light text-white leading-[28px] mt-[44px] w-full max-w-[421px] text-center lg:text-left h-auto animate-fade-in-up"
+                                style={{ animationDelay: '100ms' }}
+                            >
                                 {PARTNERS[selectedIdx % PARTNERS.length]?.description}
                             </div>
                         </div>
@@ -122,7 +152,7 @@ export default function PartnersSection() {
 
                     {/* 3. Vertical Picker (Desktop Placeholder / Link) */}
                     <div className="hidden lg:flex absolute z-15 flex-col items-end overflow-hidden right-[766px] top-0 w-[469px] h-full">
-                        <div className="flex flex-col items-end w-full gap-[48px] mt-[393px]">
+                        <div className="flex flex-col items-end w-full gap-[48px] mt-[383px]">
                             {PARTNERS.map((partner, index) => (
                                 <div
                                     key={index}
@@ -158,6 +188,19 @@ export default function PartnersSection() {
                 .animate-marquee-rtl-slow {
                     animation: marquee-rtl 45s linear infinite;
                 }
+                .animate-fade-in-up {
+                    animation: fade-in-up 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+                }
+                @keyframes fade-in-up {
+                    from {
+                        opacity: 0;
+                        transform: translateY(20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
             `}</style>
         </section>
     );
@@ -170,7 +213,7 @@ function PartnerItem({ name, isActive, onClick }: { name: string, isActive: bool
             className="flex flex-col items-center cursor-pointer py-[3px]"
         >
             <span
-                className={`font-serif text-[28px] font-normal leading-[36px] px-[8px] transition-colors duration-300 ${isActive ? 'text-[#F0B118]' : 'text-white'}`}
+                className={`font-serif text-[28px] font-normal leading-[36px] px-[8px] transition-colors duration-300 whitespace-nowrap ${isActive ? 'text-[#F0B118]' : 'text-white'}`}
             >
                 {name}
             </span>
